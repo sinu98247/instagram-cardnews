@@ -1,0 +1,77 @@
+name: Post card news
+
+on:
+  schedule:
+    - cron: "12 23 * * *"   # KST 08:12 → 아침 08:30
+    - cron: "12 3 * * *"    # KST 12:12 → 점심 12:30
+    - cron: "42 8 * * *"    # KST 17:42 → 퇴근 18:00
+    - cron: "42 10 * * *"   # KST 19:42 → 저녁 20:00
+  workflow_dispatch:
+    inputs:
+      slot:
+        description: "슬롯 (auto = 실행 시각으로 판별)"
+        type: choice
+        default: auto
+        options: [auto, morning, lunch, evening, night]
+      review_mode:
+        description: "검수 모드 (true=텔레그램 미리보기만, false=실제 게시, default=저장소 변수 따름)"
+        type: choice
+        default: default
+        options: [default, "true", "false"]
+      publish_preview:
+        description: "오늘 이 슬롯의 미리보기 결과를 그대로 게시"
+        type: boolean
+        default: false
+      force:
+        description: "잠금 무시 (중복 게시 주의)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: cardnews-post
+  cancel-in-progress: false
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      TZ: Asia/Seoul
+      REVIEW_MODE: ${{ (github.event_name == 'workflow_dispatch' && inputs.review_mode != 'default') && inputs.review_mode || vars.REVIEW_MODE || 'true' }}
+      LLM_MODEL: ${{ vars.LLM_MODEL }}
+      GRAPH_API_VERSION: ${{ vars.GRAPH_API_VERSION || 'v23.0' }}
+      IG_ACCOUNT_NAME: "@s_98247"
+      IG_USER_ID: ${{ secrets.IG_USER_ID }}
+      IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+      META_APP_ID: ${{ secrets.META_APP_ID }}
+      META_APP_SECRET: ${{ secrets.META_APP_SECRET }}
+      LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      GH_PAT: ${{ secrets.GH_PAT }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          python -m playwright install --with-deps chromium
+          bash scripts/download_fonts.sh
+      - name: Git identity
+        run: |
+          git config user.name "cardnews-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - name: Run pipeline
+        run: |
+          ARGS="--slot ${{ inputs.slot || 'auto' }}"
+          if [ "${{ inputs.publish_preview }}" = "true" ]; then ARGS="$ARGS --publish-preview"; fi
+          if [ "${{ inputs.force }}" = "true" ]; then ARGS="$ARGS --force"; fi
+          python -m src.main $ARGS
