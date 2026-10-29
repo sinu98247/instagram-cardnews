@@ -20,15 +20,19 @@ HISTORY = DATA / "history.json"
 KST = dt.timezone(dt.timedelta(hours=9))
 ACCOUNT = os.getenv("IG_ACCOUNT_NAME", "@s_98247")
 
+# 매 슬롯마다 5개 분야에서 1건씩 골라 한 게시물(브리핑)로 묶는다.
+CATEGORIES = {"econ": "경제", "society": "사회", "politics": "정치", "stock": "주식", "crypto": "코인"}
+
+# cron(UTC)은 목표 시각보다 25분 일찍. 실제 게시는 publish.py가 목표 시각까지 기다렸다가 한다.
 SLOTS = {
-    "morning": {"label": "아침", "time": "08:30", "category": "econ",
-                "theme": "경제·시장 모닝 브리핑 (밤사이 미국 증시, 환율, 주요 경제 뉴스)"},
-    "lunch": {"label": "점심", "time": "12:30", "category": "tech",
-              "theme": "AI·테크 핫이슈"},
-    "evening": {"label": "퇴근", "time": "18:00", "category": "econ",
-                "theme": "경제·재테크 (금리, 부동산, 절세, 정책 변화 등)"},
-    "night": {"label": "저녁", "time": "20:00", "category": "tech",
-              "theme": "AI·테크 실용 (새 서비스·툴, 활용법)"},
+    "morning": {"label": "아침", "time": "08:00", "cron": "35 22 * * *", "palette": "econ",
+                "theme": "밤사이·출근길 주요 뉴스 (밤사이 미국 증시·코인 흐름 포함)"},
+    "lunch": {"label": "점심", "time": "12:00", "cron": "35 2 * * *", "palette": "econ",
+              "theme": "오전 주요 뉴스 (국내 증시 오전 흐름 포함)"},
+    "evening": {"label": "저녁", "time": "20:00", "cron": "35 10 * * *", "palette": "tech",
+                "theme": "오늘 하루 주요 뉴스 (국내 증시 마감 포함)"},
+    "night": {"label": "밤", "time": "23:00", "cron": "35 13 * * *", "palette": "tech",
+              "theme": "마감 뉴스 (미국 증시 개장·코인 시장 동향 포함)"},
 }
 
 SECRET_ENV = ["IG_ACCESS_TOKEN", "META_APP_SECRET", "LLM_API_KEY", "TELEGRAM_BOT_TOKEN",
@@ -39,22 +43,24 @@ def now_kst() -> dt.datetime:
     return dt.datetime.now(KST)
 
 
-def detect_slot(t: dt.datetime | None = None) -> str:
-    """실행 시각(KST)으로 슬롯 판별. cron은 목표보다 15~18분 일찍 + 지연 가능."""
+def slot_target(slot: str, t: dt.datetime | None = None) -> dt.datetime:
+    """t(KST)에서 가장 가까운 해당 슬롯의 목표 시각 (자정 전후 지연 실행도 올바른 날짜로)."""
     t = t or now_kst()
-    m = t.hour * 60 + t.minute
-    if m < 10 * 60 + 30:
-        return "morning"
-    if m < 15 * 60 + 30:
-        return "lunch"
-    if m < 19 * 60:
-        return "evening"
-    return "night"
-
-
-def slot_target(slot: str, day: dt.date) -> dt.datetime:
     hh, mm = map(int, SLOTS[slot]["time"].split(":"))
-    return dt.datetime(day.year, day.month, day.day, hh, mm, tzinfo=KST)
+    cands = [dt.datetime(d.year, d.month, d.day, hh, mm, tzinfo=KST)
+             for d in (t.date() + dt.timedelta(days=k) for k in (-1, 0, 1))]
+    return min(cands, key=lambda x: abs((x - t).total_seconds()))
+
+
+def detect_slot(t: dt.datetime | None = None, schedule: str | None = None) -> str:
+    """스케줄 실행이면 트리거한 cron 문자열로, 아니면 현재 시각과 가장 가까운 슬롯으로 판별.
+    (GitHub 스케줄은 몇 시간씩 밀릴 수 있어 실행 시각만으로 판별하면 엉뚱한 슬롯이 된다.)"""
+    if schedule:
+        for name, s in SLOTS.items():
+            if s["cron"] == schedule.strip():
+                return name
+    t = t or now_kst()
+    return min(SLOTS, key=lambda name: abs((slot_target(name, t) - t).total_seconds()))
 
 
 # ---------- 로깅 (비밀값 마스킹) ----------

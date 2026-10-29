@@ -16,7 +16,7 @@
       <h1>{{ title_html }}</h1>
       <div class="sub">{{ body }}</div>
     {% elif kind == 'body' %}
-      <div class="num">{{ '%02d' % (index) }}</div>
+      {% if section %}<div><span class="section">{{ section }}</span></div>{% else %}<div class="num">{{ '%02d' % (index) }}</div>{% endif %}
       <h2>{{ title }}</h2>
       {% for line in lines %}<p>{{ line }}</p>{% endfor %}
     {% else %}

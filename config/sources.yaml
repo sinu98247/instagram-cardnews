@@ -1,65 +1,105 @@
 # 소재 수집 RSS 소스. weight = 신뢰도/중요도 가중치 (1.0 기준)
-# category: econ(경제·재테크) / tech(AI·테크)
+# 분야: econ(경제) / society(사회) / politics(정치) / stock(주식) / crypto(코인)
+# google_news: true → url 대신 query로 Google News RSS 검색 (항목마다 실제 언론사명을 출처로 사용).
+#   개별 언론사 피드가 막히거나 비어도 분야별 기사가 확보되도록 넣어 둔 안전망입니다.
 econ:
   - name: 연합뉴스
     url: https://www.yna.co.kr/rss/economy.xml
     weight: 1.3
-  - name: 연합뉴스
-    url: https://www.yna.co.kr/rss/market.xml
-    weight: 1.2
   - name: 한국경제
     url: https://www.hankyung.com/feed/economy
     weight: 1.2
-  - name: 한국경제
-    url: https://www.hankyung.com/feed/finance
-    weight: 1.1
   - name: 매일경제
     url: https://www.mk.co.kr/rss/30100041/
     weight: 1.2
+  - name: 동아일보
+    url: https://rss.donga.com/economy.xml
+    weight: 1.0
+  - name: Google 뉴스
+    google_news: true
+    query: 경제 OR 금리 OR 환율 OR 물가 OR 부동산
+    weight: 0.9
+
+society:
+  - name: 연합뉴스
+    url: https://www.yna.co.kr/rss/society.xml
+    weight: 1.3
+  - name: 한국경제
+    url: https://www.hankyung.com/feed/society
+    weight: 1.0
+  - name: 매일경제
+    url: https://www.mk.co.kr/rss/50400012/
+    weight: 1.0
+  - name: 동아일보
+    url: https://rss.donga.com/society.xml
+    weight: 1.1
+  - name: Google 뉴스
+    google_news: true
+    query: 사회 OR 사건 OR 사고 OR 교육 OR 노동
+    weight: 0.9
+
+politics:
+  - name: 연합뉴스
+    url: https://www.yna.co.kr/rss/politics.xml
+    weight: 1.3
+  - name: 한국경제
+    url: https://www.hankyung.com/feed/politics
+    weight: 1.0
+  - name: 매일경제
+    url: https://www.mk.co.kr/rss/30200030/
+    weight: 1.0
+  - name: 동아일보
+    url: https://rss.donga.com/politics.xml
+    weight: 1.1
+  - name: Google 뉴스
+    google_news: true
+    query: 국회 OR 대통령실 OR 여당 OR 야당 OR 정부
+    weight: 0.9
+
+stock:
+  - name: 연합뉴스
+    url: https://www.yna.co.kr/rss/market.xml
+    weight: 1.3
+  - name: 한국경제
+    url: https://www.hankyung.com/feed/finance
+    weight: 1.2
   - name: 매일경제
     url: https://www.mk.co.kr/rss/50200011/
-    weight: 1.1
+    weight: 1.2
   - name: CNBC
     url: https://www.cnbc.com/id/100003114/device/rss/rss.html
-    weight: 1.0
-tech:
-  - name: The Verge
-    url: https://www.theverge.com/rss/ai-artificial-intelligence/index.xml
-    weight: 1.2
-  - name: TechCrunch
-    url: https://techcrunch.com/category/artificial-intelligence/feed/
-    weight: 1.2
-  - name: OpenAI 블로그
-    url: https://openai.com/news/rss.xml
-    weight: 1.4
-  - name: Google 블로그
-    url: https://blog.google/technology/ai/rss/
-    weight: 1.3
-  - name: NVIDIA 블로그
-    url: https://blogs.nvidia.com/feed/
+    weight: 0.9
+  - name: Google 뉴스
+    google_news: true
+    query: 코스피 OR 코스닥 OR 나스닥 OR 증시 OR 주가
+    weight: 0.9
+
+crypto:
+  - name: 블록미디어
+    url: https://www.blockmedia.co.kr/feed
     weight: 1.1
-  - name: 연합뉴스
-    url: https://www.yna.co.kr/rss/industry.xml
+  - name: 토큰포스트
+    url: https://www.tokenpost.kr/rss
     weight: 1.0
-  - name: Ars Technica
-    url: https://feeds.arstechnica.com/arstechnica/technology-lab
+  - name: CoinDesk
+    url: https://www.coindesk.com/arc/outboundfeeds/rss/
+    weight: 1.1
+  - name: Cointelegraph
+    url: https://cointelegraph.com/rss
     weight: 1.0
-  - name: VentureBeat
-    url: https://venturebeat.com/category/ai/feed/
-    weight: 1.0
-  - name: Wired
-    url: https://www.wired.com/feed/tag/ai/latest/rss
-    weight: 1.0
-  - name: ZDNet Korea
-    url: https://feeds.feedburner.com/zdkorea
+  - name: Google 뉴스
+    google_news: true
+    query: 비트코인 OR 이더리움 OR 가상자산 OR 코인 OR 업비트
     weight: 1.0
 
 # 화제성 키워드 가중치 (제목/요약에 포함 시 가점)
 keywords:
-  econ: [금리, 환율, 코스피, 나스닥, 연준, Fed, 한국은행, 기준금리, 물가, CPI, 부동산, 아파트, 전세, 세금, 절세, 연금, ISA, 정책, 관세, 반도체, 엔비디아, 실적, 고용, 달러, 비트코인]
-  tech: [AI, 인공지능, OpenAI, ChatGPT, GPT, Claude, Anthropic, Gemini, Google, Apple, 애플, 삼성, Nvidia, 엔비디아, Meta, Microsoft, agent, 에이전트, launch, 출시, model, 모델, 앱, tool, 툴, 무료]
+  econ: [금리, 환율, 연준, Fed, 한국은행, 기준금리, 물가, CPI, 부동산, 아파트, 전세, 세금, 연금, 관세, 수출, 고용, 달러, 성장률, 가계부채, 예산]
+  society: [사건, 사고, 경찰, 검찰, 법원, 판결, 재판, 교육, 수능, 의료, 병원, 노동, 파업, 저출생, 고령화, 날씨, 재난, 안전, 복지, 실종]
+  politics: [대통령, 대통령실, 국회, 여당, 야당, 국민의힘, 민주당, 총리, 장관, 법안, 특검, 탄핵, 선거, 여론조사, 외교, 정상회담, 북한, 국정감사, 예산안, 개헌]
+  stock: [코스피, 코스닥, 나스닥, S&P, 다우, 증시, 주가, 상장, IPO, 실적, 반도체, 삼성전자, SK하이닉스, 엔비디아, 테슬라, 외국인, 기관, 공매도, 배당, ETF]
+  crypto: [비트코인, BTC, 이더리움, ETH, 리플, XRP, 솔라나, 가상자산, 암호화폐, 코인, 업비트, 빗썸, ETF, 스테이블코인, 거래소, 반감기, SEC, 김치프리미엄, 알트코인, 해킹]
 
 lookback_hours: 12
-dedupe_days: 7
-min_candidates: 10
-max_candidates: 20
+dedupe_days: 3
+max_candidates: 15

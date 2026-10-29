@@ -1,4 +1,4 @@
-"""소재 수집: RSS → 최근 12시간 → 후보 10~20개 점수화 → 7일 중복 제외 → 1개 선정 (출처 2개 이상)."""
+"""소재 수집: 분야(경제·사회·정치·주식·코인)별 RSS → 최근 12시간 → 점수화 → 최근 중복 제외 → 분야별 1건 선정 (출처 2개 이상)."""
 from __future__ import annotations
 
 import argparse
@@ -13,7 +13,7 @@ import feedparser
 import requests
 import yaml
 
-from .common import CONFIG, SLOTS, StepError, get_logger, load_history, now_kst, retry
+from .common import CATEGORIES, CONFIG, SLOTS, StepError, get_logger, load_history, now_kst, retry
 
 log = get_logger("collect")
 UA = {"User-Agent": "Mozilla/5.0 (cardnews-bot; +https://github.com)"}
@@ -56,12 +56,20 @@ def fetch_feed(url: str):
     return feedparser.parse(r.content)
 
 
+def google_news_url(query: str, hours: int) -> str:
+    return (f"https://news.google.com/rss/search?q={urllib.parse.quote(query)}+when:{max(1, hours)}h"
+            "&hl=ko&gl=KR&ceid=KR:ko")
+
+
 def gather(category: str, cfg: dict) -> list[dict]:
-    cutoff = dt.datetime.now(dt.timezone.utc) - dt.timedelta(hours=cfg.get("lookback_hours", 12))
+    hours = cfg.get("lookback_hours", 12)
+    cutoff = dt.datetime.now(dt.timezone.utc) - dt.timedelta(hours=hours)
     items = []
     for src in cfg[category]:
+        gnews = bool(src.get("google_news"))
+        url = google_news_url(src["query"], hours) if gnews else src["url"]
         try:
-            feed = fetch_feed(src["url"])
+            feed = fetch_feed(url)
         except StepError as e:
             log.warning("피드 실패 %s: %s", src["name"], e.message)
             continue
@@ -69,15 +77,19 @@ def gather(category: str, cfg: dict) -> list[dict]:
             t = entry_time(e)
             if not t or t < cutoff:
                 continue
+            title, source = clean(e.get("title", "")), src["name"]
+            if gnews:  # Google News는 항목마다 실제 언론사가 다르고 제목 끝에 " - 언론사"가 붙는다
+                source = clean((e.get("source") or {}).get("title", "")) or source
+                title = re.sub(rf"\s+-\s+{re.escape(source)}$", "", title)
             items.append({
-                "title": clean(e.get("title", "")),
-                "summary": clean(e.get("summary", ""))[:600],
+                "title": title,
+                "summary": "" if gnews else clean(e.get("summary", ""))[:600],
                 "url": e.get("link", ""),
-                "source": src["name"],
+                "source": source,
                 "weight": float(src.get("weight", 1.0)),
                 "published": t.isoformat(),
             })
-    log.info("%s: 최근 %sh 기사 %d건", category, cfg.get("lookback_hours", 12), len(items))
+    log.info("%s: 최근 %sh 기사 %d건", category, hours, len(items))
     return items
 
 
@@ -108,8 +120,11 @@ def score(items: list[dict], category: str, cfg: dict) -> list[dict]:
 
 def recent_topics(days: int) -> list[str]:
     cutoff = (now_kst() - dt.timedelta(days=days)).date().isoformat()
-    return [h.get("topic", "") + " " + h.get("source_title", "") for h in load_history()
-            if h.get("date", "") >= cutoff and h.get("status") in ("published", "preview")]
+    out = []
+    for h in load_history():
+        if h.get("date", "") >= cutoff and h.get("status") in ("published", "preview"):
+            out += [it.get("title", "") for it in h.get("items", [])] or [h.get("topic", "") + " " + h.get("source_title", "")]
+    return out
 
 
 def same_publisher(a: str, b: str) -> bool:
@@ -154,19 +169,16 @@ def fetch_article_text(url: str, limit: int = 3000) -> str:
         return ""
 
 
-def collect(slot: str) -> dict:
-    cfg = load_config()
-    category = SLOTS[slot]["category"]
+def pick(category: str, cfg: dict, avoid: list[str]) -> dict | None:
+    """분야 하나에서 최근 중복·다른 분야와 겹침을 피하고 출처 2곳 이상 교차 확인된 기사 1건 선정."""
     items = gather(category, cfg)
     if not items:
-        raise StepError("collect", "최근 12시간 내 수집된 기사가 없습니다")
+        log.warning("%s: 최근 %sh 내 수집된 기사가 없습니다", category, cfg.get("lookback_hours", 12))
+        return None
     cands = score(items, category, cfg)
-    if len(cands) < cfg.get("min_candidates", 10):
-        log.warning("후보가 %d개로 최소 기준(%d)보다 적습니다", len(cands), cfg.get("min_candidates", 10))
-    past = recent_topics(cfg.get("dedupe_days", 7))
     for c in cands:
-        if any(similarity(c["title"], p) >= 0.35 for p in past):
-            log.info("최근 7일 중복으로 제외: %s", c["title"])
+        if any(similarity(c["title"], p) >= 0.35 for p in avoid):
+            log.info("최근 게시·다른 분야와 중복으로 제외: %s", c["title"])
             continue
         sources = [{"title": c["title"], "url": c["url"], "source": c["source"], "summary": c["summary"]}]
         for r in c["related"]:
@@ -180,18 +192,33 @@ def collect(slot: str) -> dict:
             log.info("교차 확인 출처 부족으로 제외: %s", c["title"])
             continue
         for s in sources[:3]:
-            s["text"] = fetch_article_text(s["url"])
+            s["text"] = fetch_article_text(s["url"], limit=1500)
         return {
-            "slot": slot,
             "category": category,
-            "theme": SLOTS[slot]["theme"],
+            "label": CATEGORIES[category],
             "selected": {k: c[k] for k in ("title", "summary", "url", "source", "published", "score", "score_detail")},
             "reason": f"다매체 보도 {c['score_detail']['coverage']}곳, 키워드 {c['score_detail']['keywords']}개, "
                       f"소스 가중치 {c['weight']}, 최신성 {c['score_detail']['recency']} → 점수 {c['score']}",
-            "sources": sources[:4],
+            "sources": sources[:3],
             "candidates": [{"title": x["title"], "source": x["source"], "score": x["score"]} for x in cands],
         }
-    raise StepError("collect", "중복·교차확인 조건을 통과한 주제가 없습니다")
+    log.warning("%s: 중복·교차확인 조건을 통과한 기사가 없습니다", category)
+    return None
+
+
+def collect(slot: str) -> dict:
+    cfg = load_config()
+    avoid = recent_topics(cfg.get("dedupe_days", 3))
+    picked = []
+    for category in CATEGORIES:
+        it = pick(category, cfg, avoid)
+        if it:
+            picked.append(it)
+            avoid.append(it["selected"]["title"])  # 같은 사건이 두 분야에 동시에 실리지 않게
+    min_items = cfg.get("min_categories", 3)
+    if len(picked) < min_items:
+        raise StepError("collect", f"기사를 고른 분야가 {len(picked)}개뿐입니다 (최소 {min_items}개)")
+    return {"slot": slot, "theme": SLOTS[slot]["theme"], "items": picked}
 
 
 if __name__ == "__main__":

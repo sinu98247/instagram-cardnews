@@ -1,6 +1,6 @@
 """오케스트레이터: 수집 → 원고 → 렌더 → 커밋/푸시 → URL 검증 → (검수 미리보기 | 게시) → 기록·알림.
 
-실행: python -m src.main [--slot morning|lunch|evening|night] [--force] [--publish-preview] [--dry-run]
+실행: python -m src.main [--slot morning|lunch|evening|night] [--schedule "<cron>"] [--scheduled] [--force] [--publish-preview] [--dry-run]
 """
 from __future__ import annotations
 
@@ -20,6 +20,8 @@ from . import token as ig_token
 from . import write as write_mod
 
 log = get_logger("main")
+# 예약 실행이 목표 시각보다 이만큼(분) 넘게 늦으면 게시하지 않는다 (예: 08시 브리핑이 오후에 올라가는 것 방지)
+MAX_LATE_MIN = int(os.getenv("MAX_LATE_MINUTES") or 90)
 
 
 def git(*args: str) -> str:
@@ -62,7 +64,8 @@ def step_render(doc, out_dir):
 def build(slot: str, date: str) -> tuple[dict, list[str]]:
     out_dir = OUTPUT / date / slot
     collected = step_collect(slot)
-    log.info("선정: %s (%s)", collected["selected"]["title"], collected["reason"])
+    for it in collected["items"]:
+        log.info("선정 [%s] %s (%s)", it["label"], it["selected"]["title"], it["reason"])
     doc = step_write(collected)
     doc["date"] = date
     res = step_render(doc, out_dir)
@@ -76,15 +79,17 @@ def build(slot: str, date: str) -> tuple[dict, list[str]]:
         raise StepError("render", f"재요약 후에도 글자 넘침: 카드 {[i + 1 for i in res['overflow']]}")
     (out_dir / "post.json").write_text(json.dumps(doc, ensure_ascii=False, indent=2), encoding="utf-8")
     (out_dir / "collected.json").write_text(json.dumps(
-        {k: collected[k] for k in ("selected", "reason", "candidates")} |
-        {"sources": [{k: s[k] for k in ("source", "title", "url")} for s in collected["sources"]]},
+        [{k: it[k] for k in ("category", "selected", "reason", "candidates")} |
+         {"sources": [{k: s[k] for k in ("source", "title", "url")} for s in it["sources"]]}
+         for it in collected["items"]],
         ensure_ascii=False, indent=2), encoding="utf-8")
     return doc, res["files"]
 
 
-def run(slot: str, force: bool, publish_preview: bool, dry_run: bool) -> int:
+def run(slot: str, force: bool, publish_preview: bool, dry_run: bool, scheduled: bool = False) -> int:
     t = now_kst()
-    date = t.date().isoformat()
+    target = slot_target(slot, t)
+    date = target.date().isoformat()
     label = f"{SLOTS[slot]['label']}({SLOTS[slot]['time']})"
     review = os.getenv("REVIEW_MODE", "true").lower() == "true" and not publish_preview
     log.info("슬롯=%s 날짜=%s REVIEW_MODE=%s", slot, date, review)
@@ -92,6 +97,12 @@ def run(slot: str, force: bool, publish_preview: bool, dry_run: bool) -> int:
     lock = slot_locked(date, slot, include_preview=not publish_preview)
     if lock and not force:
         log.info("이미 처리된 슬롯입니다 (%s) → 종료", lock.get("status"))
+        return 0
+    late_min = (t - target).total_seconds() / 60
+    if scheduled and not force and late_min > MAX_LATE_MIN:
+        msg = f"예약 실행이 {late_min:.0f}분 늦게 시작되어 건너뜁니다 (허용 {MAX_LATE_MIN}분)"
+        log.warning(msg)
+        notify.send(f"⏭️ {label} 슬롯 건너뜀\n{msg}")
         return 0
 
     step = "init"
@@ -109,7 +120,7 @@ def run(slot: str, force: bool, publish_preview: bool, dry_run: bool) -> int:
         else:
             step = "build"
             doc, files = build(slot, date)
-        entry |= {"topic": doc["topic"], "source_title": doc["sources"][0]["title"] if doc["sources"] else "",
+        entry |= {"topic": doc["topic"], "items": [{k: it[k] for k in ("category", "title")} for it in doc.get("items", [])],
                   "sources": [s["url"] for s in doc["sources"]]}
         if dry_run:
             log.info("dry-run: 렌더링까지만 수행 → %s", files)
@@ -127,7 +138,7 @@ def run(slot: str, force: bool, publish_preview: bool, dry_run: bool) -> int:
             entry |= {"status": "preview", "image_urls": urls}
         else:
             step = "publish"
-            res = publish_mod.publish(urls, doc["caption"], publish_at=slot_target(slot, t.date()))
+            res = publish_mod.publish(urls, doc["caption"], publish_at=target)
             entry |= {"status": "published", "media_id": res["media_id"], "permalink": res["permalink"],
                       "published_at": now_kst().isoformat(), "image_urls": urls}
             notify.success(label, doc["topic"], res["permalink"])
@@ -158,9 +169,11 @@ def main() -> None:
     ap.add_argument("--force", action="store_true", help="잠금 무시 (주의: 중복 게시 가능)")
     ap.add_argument("--publish-preview", action="store_true", help="REVIEW_MODE 미리보기 결과를 그대로 게시")
     ap.add_argument("--dry-run", action="store_true", help="수집·원고·렌더까지만")
+    ap.add_argument("--schedule", default="", help="트리거한 cron 문자열 (github.event.schedule) → 슬롯 판별")
+    ap.add_argument("--scheduled", action="store_true", help="예약 실행: 목표 시각보다 너무 늦으면 건너뜀")
     a = ap.parse_args()
-    slot = detect_slot() if a.slot == "auto" else a.slot
-    sys.exit(run(slot, a.force, a.publish_preview, a.dry_run))
+    slot = detect_slot(schedule=a.schedule) if a.slot == "auto" else a.slot
+    sys.exit(run(slot, a.force, a.publish_preview, a.dry_run, scheduled=a.scheduled or bool(a.schedule)))
 
 
 if __name__ == "__main__":

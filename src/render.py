@@ -27,7 +27,7 @@ CHECK_JS = """
   const cr = c.getBoundingClientRect();
   const over = c.scrollHeight > c.clientHeight + 1 || c.scrollWidth > c.clientWidth + 1;
   const clipped = [];
-  c.querySelectorAll('h1,h2,p,li,.sub,.cta,.disclaimer').forEach(el => {
+  c.querySelectorAll('h1,h2,p,li,.sub,.cta,.disclaimer,.section').forEach(el => {
     const r = el.getBoundingClientRect();
     if (r.bottom > cr.bottom + 1 || r.right > cr.right + 1 || r.left < cr.left - 1) clipped.push(el.textContent.slice(0, 20));
   });
@@ -59,13 +59,15 @@ def card_context(doc: dict, i: int, steps: tuple[int, int]) -> dict:
     slot = doc.get("slot", "morning")
     date = doc.get("date") or now_kst().date().isoformat()
     d = dt.date.fromisoformat(date)
+    sections = [x["section"] for x in doc["cards"] if x.get("section")]
     return {
         "base_href": TEMPLATES.resolve().as_uri() + "/",
         "size_vars": Markup(size_vars),
-        "category": doc.get("category", SLOTS[slot]["category"]),
+        "category": doc.get("palette") or SLOTS[slot]["palette"],
         "kind": kind,
         "index": i,
-        "tag": f"{SLOTS[slot]['label']} 브리핑 · {'경제' if SLOTS[slot]['category']=='econ' else 'AI·테크'}",
+        "section": c.get("section", ""),
+        "tag": f"{SLOTS[slot]['label']} 브리핑 · {'·'.join(sections) if sections else '뉴스'}",
         "title": c.get("title", "").replace("**", ""),
         "title_html": _cover_title_html(c.get("title", "")),
         "body": c.get("body", ""),

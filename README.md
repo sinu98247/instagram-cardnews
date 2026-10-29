@@ -1,23 +1,29 @@
 # instagram-cardnews — @s_98247 카드뉴스 자동 게시
 
-하루 4회(KST 08:30 / 12:30 / 18:00 / 20:00) **소재 수집 → 원고 작성(Claude) → 카드 이미지 렌더링 → 인스타 캐러셀 게시 → 기록·텔레그램 알림**을 GitHub Actions로 자동 실행합니다.
+하루 4회(KST **08:00 / 12:00 / 20:00 / 23:00**) **경제·사회·정치·주식·코인** 5개 분야에서 1건씩 골라 한 게시물(뉴스 브리핑)로 묶어
+**소재 수집 → 원고 작성(Claude) → 카드 이미지 렌더링 → 인스타 캐러셀 게시 → 기록·텔레그램 알림**을 GitHub Actions로 자동 실행합니다.
 
-| 슬롯 | 게시 목표 | cron (UTC) | 주제 | 팔레트 |
+| 슬롯 | 게시 시각 | cron (UTC) | 방향 | 팔레트 |
 |---|---|---|---|---|
-| morning (아침) | 08:30 | `12 23 * * *` | 경제·시장 모닝 브리핑 | 네이비+골드 |
-| lunch (점심) | 12:30 | `12 3 * * *` | AI·테크 핫이슈 | 다크+퍼플/시안 |
-| evening (퇴근) | 18:00 | `42 8 * * *` | 경제·재테크 | 네이비+골드 |
-| night (저녁) | 20:00 | `42 10 * * *` | AI·테크 실용 | 다크+퍼플/시안 |
+| morning (아침) | 08:00 | `35 22 * * *` | 밤사이·출근길 주요 뉴스 | 네이비+골드 |
+| lunch (점심) | 12:00 | `35 2 * * *` | 오전 주요 뉴스 | 네이비+골드 |
+| evening (저녁) | 20:00 | `35 10 * * *` | 오늘 하루 주요 뉴스·국내 증시 마감 | 다크+퍼플/시안 |
+| night (밤) | 23:00 | `35 13 * * *` | 마감 뉴스·미국 증시 개장·코인 | 다크+퍼플/시안 |
 
-cron은 15~18분 일찍 돌고, 준비가 끝나면 **목표 시각까지 기다렸다가** 게시합니다(최대 30분). 실행 시각으로 슬롯을 판별하며, 수동 실행 시 슬롯을 직접 고를 수 있습니다.
+카드 구성(7장): **표지 → 경제 → 사회 → 정치 → 주식 → 코인 → 한눈에 보기**. 어떤 분야에서 조건(최근 12시간, 최근 3일 중복 제외, 출처 2곳 이상 교차 확인)을 통과한 기사가 없으면 그 분야만 빠지고, 3개 분야 미만이면 그 슬롯은 실패 처리됩니다.
+
+cron은 25분 일찍 돌고, 준비가 끝나면 **게시 시각까지 기다렸다가** 게시합니다(최대 30분).
+슬롯은 실행을 일으킨 cron 문자열로 판별하고(`src/common.py`의 `SLOTS[*]["cron"]`과 같아야 함), 예약 실행이 게시 시각보다 **90분 넘게 늦으면 건너뜁니다**(`MAX_LATE_MINUTES` 변수로 조정). 수동 실행 시 슬롯을 직접 고를 수 있습니다.
+
+> ⚠️ **GitHub 예약 실행은 몇 시간씩 늦거나 아예 빠질 수 있습니다.** 실제로 이 저장소에서도 3~6시간 지연이 있었습니다. 정시 게시가 중요하면 아래 **"8. 정시 실행(외부 스케줄러)"** 설정을 권장합니다.
 
 ## 구조
 ```
 .github/workflows/post.yml       # 4회 스케줄 + 수동 실행
 .github/workflows/insights.yml   # 매주 일요일 09:00(KST) 주간 성과
-config/sources.yaml              # RSS 소스·키워드·기간 설정
-src/collect.py   # RSS 수집(12시간) → 점수화 → 7일 중복 제외 → 출처 2곳 이상 교차확인
-src/write.py     # Claude로 6장 원고 + 캡션/해시태그(JSON), 규칙 자동 검증·재작성
+config/sources.yaml              # 분야별 RSS 소스·키워드·기간 설정
+src/collect.py   # 분야별 RSS·Google 뉴스 수집(12시간) → 점수화 → 3일 중복 제외 → 출처 2곳 이상 교차확인 → 분야별 1건
+src/write.py     # Claude로 브리핑 원고(표지+분야별 카드+한눈에 보기) + 캡션/해시태그(JSON), 규칙 자동 검증·재작성
 src/render.py    # Playwright로 1080×1350 JPEG(q90) 렌더, 폰트 단계 축소·넘침 점검
 src/publish.py   # Graph API 캐러셀 게시 (URL 200/jpeg 확인, 상태 폴링, 한도 확인)
 src/token.py     # 토큰 만료 점검, 10일 이하면 갱신 + GitHub Secret 자동 업데이트
@@ -101,20 +107,21 @@ samples/                 # 렌더 테스트용 원고 샘플
 | `IG_ACCESS_TOKEN` | 2-3의 장기 토큰 |
 | `META_APP_ID` | 앱 ID |
 | `META_APP_SECRET` | 앱 시크릿 |
-| `LLM_API_KEY` | Anthropic API 키 (https://console.anthropic.com → API Keys) |
+| `LLM_API_KEY` | Anthropic API 키 (https://console.anthropic.com → API Keys) — **없으면 원고 단계에서 매번 실패합니다** |
 | `TELEGRAM_BOT_TOKEN` | 봇 토큰 |
 | `TELEGRAM_CHAT_ID` | 채팅 ID |
 | `GH_PAT` | 위에서 만든 토큰 |
 
 4. 같은 화면의 **Variables** 탭에서 (선택):
    - `REVIEW_MODE` = `true` (초기 2주 권장, 기본값도 true)
-   - `LLM_MODEL` = 사용할 Claude 모델 ID (미설정 시 `claude-sonnet-4-5`)
+   - `LLM_MODEL` = 사용할 Claude 모델 ID (미설정 시 `claude-opus-5-5`, 비용을 줄이려면 `claude-sonnet-5-5`)
+   - `MAX_LATE_MINUTES` = 예약 실행 허용 지연(분, 기본 90)
    - `GRAPH_API_VERSION` = 예: `v23.0`
 5. Settings → Actions → General → Workflow permissions: **Read and write permissions** 선택.
 
 ## 5. 첫 수동 테스트 (반드시 REVIEW_MODE=true 먼저)
-1. Actions 탭 → **Post card news** → Run workflow → `slot`: 예) lunch, `review_mode`: **true** → 실행.
-2. 수 분 뒤 텔레그램으로 카드 6장 + 캡션 미리보기가 옵니다. 인스타에는 올라가지 않습니다. (history에 `preview`로 기록되어 같은 슬롯 자동 실행은 건너뜁니다.)
+1. Actions 탭 → **Post card news** → Run workflow → `slot`: 예) evening, `review_mode`: **true** → 실행.
+2. 수 분 뒤 텔레그램으로 카드 7장 + 캡션 미리보기가 옵니다. 인스타에는 올라가지 않습니다. (history에 `preview`로 기록되어 같은 슬롯 자동 실행은 건너뜁니다.)
 3. 미리보기가 괜찮으면 → Run workflow → 같은 `slot`, `publish_preview`: **체크** → 그 결과물을 실제 게시합니다. 텔레그램으로 게시 링크가 옵니다.
 4. 마음에 들지 않으면 아무것도 하지 않으면 됩니다(건너뜀).
 5. 2주 정도 안정적이면 Variables의 `REVIEW_MODE` 를 `false` 로 바꾸면 완전 자동 게시로 전환됩니다.
@@ -126,7 +133,7 @@ samples/                 # 렌더 테스트용 원고 샘플
 python -m venv .venv && . .venv/bin/activate
 pip install -r requirements.txt && python -m playwright install chromium
 bash scripts/download_fonts.sh
-python -m src.render samples/sample_tech.json --out output/_tmp/tech
+python -m src.render samples/sample_briefing.json --out output/_tmp/briefing
 ```
 
 ## 6. 안전장치
@@ -134,7 +141,27 @@ python -m src.render samples/sample_tech.json --out output/_tmp/tech
 - `data/history.json` 으로 **같은 날 같은 슬롯 중복 게시 금지** (`force` 로만 해제).
 - 게시 직전 `content_publishing_limit` 으로 24시간 한도 확인.
 - 비밀값은 Secrets에만 두며, 로그는 자동 마스킹합니다.
-- 원고 규칙: 원문 8어절 이상 연속 복사 감지 시 재작성, 출처 2곳 이상 교차 확인, 경제 슬롯은 마지막 카드·캡션에 "투자 판단은 본인 책임" 문구 자동 포함, 매수·매도 권유/낚시성 표현 차단.
+- 원고 규칙: 원문 8어절 이상 연속 복사 감지 시 재작성, 출처 2곳 이상 교차 확인, 주식·코인이 포함되므로 마지막 카드·캡션에 "투자 판단은 본인 책임" 문구 자동 포함, 매수·매도 권유/가격 예측/낚시성 표현 차단, 정치 뉴스는 중립적 사실 전달.
+- 예약 실행이 게시 시각보다 `MAX_LATE_MINUTES`(기본 90분) 넘게 늦으면 게시하지 않고 텔레그램으로 알립니다.
 
 ## 7. 주간 성과
 `insights.yml` 이 매주 일요일 09:00(KST)에 최근 7일 게시물의 좋아요·저장·도달을 `data/insights/날짜.json` 으로 저장하고 텔레그램으로 요약을 보냅니다. (`instagram_manage_insights` 권한 필요)
+
+## 8. 정시 실행(외부 스케줄러, 권장)
+GitHub 예약 실행은 지연·누락이 잦으므로, 무료 외부 cron 서비스(예: https://cron-job.org)가 정시에 워크플로를 호출하게 하면 안정적입니다. 기존 GitHub cron은 백업으로 그대로 두면 되고, 같은 날 같은 슬롯은 한 번만 게시됩니다(잠금).
+
+1. GitHub → Settings → Developer settings → Fine-grained tokens → 새 토큰: 저장소 `instagram-cardnews`, 권한 **Actions: Read and write**.
+2. cron-job.org에서 작업 4개 생성 (시간대 **Asia/Seoul**, 게시 시각 25분 전):
+
+   | 실행 시각 | slot |
+   |---|---|
+   | 07:35 | morning |
+   | 11:35 | lunch |
+   | 19:35 | evening |
+   | 22:35 | night |
+
+   - URL: `https://api.github.com/repos/<아이디>/instagram-cardnews/actions/workflows/post.yml/dispatches`
+   - Method: `POST`
+   - Headers: `Authorization: Bearer <위 토큰>`, `Accept: application/vnd.github+json`
+   - Body: `{"ref":"main","inputs":{"slot":"morning","scheduled":"true"}}` (slot만 바꿔서)
+3. 응답 코드 `204`면 성공입니다. Actions 탭에서 실행이 바로 시작되는지 확인하세요.

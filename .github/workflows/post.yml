@@ -2,10 +2,11 @@ name: Post card news
 
 on:
   schedule:
-    - cron: "12 23 * * *"   # KST 08:12 → 아침 08:30
-    - cron: "12 3 * * *"    # KST 12:12 → 점심 12:30
-    - cron: "42 8 * * *"    # KST 17:42 → 퇴근 18:00
-    - cron: "42 10 * * *"   # KST 19:42 → 저녁 20:00
+    # src/common.py 의 SLOTS[*]["cron"] 과 글자 하나까지 같아야 슬롯이 판별됩니다.
+    - cron: "35 22 * * *"   # KST 07:35 → 아침 08:00
+    - cron: "35 2 * * *"    # KST 11:35 → 점심 12:00
+    - cron: "35 10 * * *"   # KST 19:35 → 저녁 20:00
+    - cron: "35 13 * * *"   # KST 22:35 → 밤 23:00
   workflow_dispatch:
     inputs:
       slot:
@@ -26,6 +27,10 @@ on:
         description: "잠금 무시 (중복 게시 주의)"
         type: boolean
         default: false
+      scheduled:
+        description: "예약 실행으로 취급 (외부 스케줄러용: 목표 시각보다 너무 늦으면 건너뜀)"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -42,6 +47,7 @@ jobs:
       TZ: Asia/Seoul
       REVIEW_MODE: ${{ (github.event_name == 'workflow_dispatch' && inputs.review_mode != 'default') && inputs.review_mode || vars.REVIEW_MODE || 'true' }}
       LLM_MODEL: ${{ vars.LLM_MODEL }}
+      MAX_LATE_MINUTES: ${{ vars.MAX_LATE_MINUTES }}
       GRAPH_API_VERSION: ${{ vars.GRAPH_API_VERSION || 'v23.0' }}
       IG_ACCOUNT_NAME: "@s_98247"
       IG_USER_ID: ${{ secrets.IG_USER_ID }}
@@ -70,8 +76,12 @@ jobs:
           git config user.name "cardnews-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
       - name: Run pipeline
+        env:
+          SCHEDULE: ${{ github.event.schedule }}
         run: |
-          ARGS="--slot ${{ inputs.slot || 'auto' }}"
-          if [ "${{ inputs.publish_preview }}" = "true" ]; then ARGS="$ARGS --publish-preview"; fi
-          if [ "${{ inputs.force }}" = "true" ]; then ARGS="$ARGS --force"; fi
-          python -m src.main $ARGS
+          ARGS=(--slot "${{ inputs.slot || 'auto' }}")
+          if [ -n "$SCHEDULE" ]; then ARGS+=(--schedule "$SCHEDULE"); fi
+          if [ "${{ inputs.scheduled }}" = "true" ]; then ARGS+=(--scheduled); fi
+          if [ "${{ inputs.publish_preview }}" = "true" ]; then ARGS+=(--publish-preview); fi
+          if [ "${{ inputs.force }}" = "true" ]; then ARGS+=(--force); fi
+          python -m src.main "${ARGS[@]}"
