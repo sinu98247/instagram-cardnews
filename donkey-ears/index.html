@@ -87,6 +87,29 @@
   .intro .ears { font-size: 54px; text-align: center; margin-bottom: 4px; }
   .small { font-size: 12px !important; }
 
+  /* 위장 화면: 평범한 업무 메모 앱처럼 */
+  #disguise { position: fixed; inset: 0; z-index: 50; background: #f6f7f9; color: #1f2329;
+    font-family: -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif;
+    display: flex; flex-direction: column; }
+  #disguise .dg-top { background: #fff; border-bottom: 1px solid #e3e6ea; padding: calc(14px + env(safe-area-inset-top)) 16px 12px;
+    display: flex; align-items: center; justify-content: space-between; user-select: none; -webkit-user-select: none; }
+  #disguise .dg-top b { font-size: 17px; }
+  #disguise .dg-top span { font-size: 12px; color: #8a9099; }
+  #disguise ul { list-style: none; margin: 0; padding: 8px 16px; overflow-y: auto; flex: 1; }
+  #disguise li { background: #fff; border: 1px solid #e3e6ea; border-radius: 10px; padding: 12px 14px; margin: 8px 0;
+    display: flex; gap: 10px; align-items: flex-start; font-size: 15px; line-height: 1.45; }
+  #disguise li input { margin-top: 3px; width: 18px; height: 18px; accent-color: #3b6cf6; flex: none; }
+  #disguise li small { display: block; color: #8a9099; font-size: 12px; margin-top: 2px; }
+  #disguise .dg-new { display: flex; gap: 8px; padding: 10px 16px calc(12px + env(safe-area-inset-bottom)); background: #fff; border-top: 1px solid #e3e6ea; }
+  #disguise .dg-new input { flex: 1; min-width: 0; border: 1px solid #d5d9df; border-radius: 10px; padding: 11px 12px; font: inherit; font-size: 16px; color: #1f2329; background: #fff; }
+  #disguise .dg-new button { background: #3b6cf6; color: #fff; border-radius: 10px; padding: 0 16px; font-weight: 600; }
+  #quick .chip.edit { border-color: var(--danger); color: var(--danger); }
+  #quick .chip.tool { color: var(--ink-dim); }
+  .check { display: flex; align-items: center; gap: 10px; margin-top: 12px; font-size: 14px; color: var(--ink); }
+  .check input { width: 18px; height: 18px; accent-color: var(--accent); }
+  .section { border-top: 1px solid var(--line); margin-top: 18px; padding-top: 14px; }
+  .section h3 { margin: 0 0 4px; font-size: 16px; }
+  .big-emoji { font-size: 48px; text-align: center; }
   #toast { position: fixed; left: 50%; bottom: 110px; transform: translateX(-50%); z-index: 20;
     background: rgba(0,0,0,.8); border: 1px solid var(--line); padding: 10px 14px; border-radius: 12px;
     font-size: 13px; max-width: calc(100% - 32px); text-align: center; opacity: 0; transition: opacity .25s; pointer-events: none; }
@@ -99,7 +122,8 @@
 <header>
   <h1>🫏 임금님 귀는 당나귀 귀<small>대나무숲은 비밀을 지켜요</small></h1>
   <div class="top-btns">
-    <button class="chip" id="openVoice">🎙 내 목소리</button>
+    <button class="chip" id="panic" title="숨기기 (PC: Esc)">🙈 숨기기</button>
+    <button class="chip" id="openVoice">🎙</button>
     <button class="chip" id="openSettings" aria-label="설정">⚙</button>
   </div>
 </header>
@@ -108,17 +132,13 @@
 <div id="count"><span id="countText">묻은 말 0개</span><button class="chip" id="blowAway">🍃 날려보내기</button></div>
 
 <div id="bar">
-  <div id="quick">
-    <button type="button" class="chip">임금님 귀는 당나귀 귀!</button>
-    <button type="button" class="chip">김부장님 퇴근 좀 시켜주세요!</button>
-    <button type="button" class="chip">월요일 진짜 싫다!!</button>
-  </div>
+  <div id="quick"></div>
   <form id="chat" autocomplete="off">
     <button type="button" id="shout" title="눌러서 외치고, 다시 눌러서 멈추기">📣</button>
-    <input id="msg" maxlength="200" placeholder="아무도 안 들어요. 속 시원하게 외쳐보세요">
+    <input id="msg" maxlength="120" placeholder="상사 욕, 여기다 쓰세요. 나만 들어요">
     <button id="send" type="submit">외치기</button>
   </form>
-  <p id="hint">📣를 누르면 내 육성 그대로, 글은 AI 음성으로 숲에 메아리쳐요</p>
+  <p id="hint">🎧 이어폰으로만 들려드려요 · 누가 오면 🙈</p>
 </div>
 
 <!-- 인트로 -->
@@ -128,7 +148,8 @@
     <h2>임금님 귀는 당나귀 귀</h2>
     <p>임금님의 비밀을 알게 된 복두장이는 끝내 참지 못하고 대나무숲에 들어가 외쳤어요. <b style="color:var(--ink)">"임금님 귀는 당나귀 귀!"</b></p>
     <p>여기는 그 대나무숲이에요. 상사, 친구, 전 애인, 세상 누구든 실컷 욕하고 뒷담화해도 괜찮아요. 숲은 당신 목소리로 메아리만 돌려줄 뿐이에요.</p>
-    <p class="small">🔒 여기서 한 말은 서버로 가지 않고, 창을 닫으면 사라져요. 목소리 샘플만 이 기기에 저장돼요.</p>
+    <p>회의 중에도, 자리에서도 <b style="color:var(--ink)">🎧 이어폰 끼고 타이핑만 하면</b> 내 목소리로 상사 욕을 들을 수 있어요. 누가 오면 <b style="color:var(--ink)">🙈 숨기기</b>.</p>
+    <p class="small">🔒 여기서 한 말은 서버에 저장되지 않고, 창을 닫으면 사라져요.</p>
     <div class="row"><button class="btn primary" id="enter">숲으로 들어가기</button></div>
   </div>
 </div>
@@ -156,7 +177,14 @@
 <!-- 설정 -->
 <div class="overlay hidden" id="settingsModal">
   <div class="card">
-    <h2>⚙ 진짜 내 목소리로 말하기</h2>
+    <h2>⚙ 설정</h2>
+    <h3 style="margin:6px 0 0;font-size:16px">🧑‍💼 업무 모드</h3>
+    <label class="field">욕할 대상 이름·별명 <span class="small">(빠른 문장의 {이름} 자리에 들어가요)</span>
+      <input id="bossName" maxlength="12" placeholder="예: 김부장" autocomplete="off">
+    </label>
+    <label class="check"><input type="checkbox" id="optEcho"> 대나무숲 메아리 효과 (끄면 한 번만 또렷하게)</label>
+    <label class="check"><input type="checkbox" id="optReturnHide"> 앱으로 돌아오면 위장 화면부터 보여주기</label>
+    <div class="section"><h3>🟢 진짜 내 목소리로 말하기</h3></div>
     <p>기본 모드는 휴대폰/PC에 내장된 한국어 음성을 <b style="color:var(--ink)">내 음높이에 맞춰</b> 바꾸는 방식이라 "비슷한 톤"까지만 돼요.</p>
     <p>ElevenLabs API 키를 넣으면 등록한 샘플로 <b style="color:var(--ink)">목소리를 복제</b>해서, 쓴 글을 진짜 내 목소리로 읽어줘요.</p>
     <p class="small">💳 목소리 복제는 ElevenLabs 유료 플랜(Starter 이상)에서 돼요. 샘플은 30초~1분 정도로 녹음할수록 더 닮아요.</p>
@@ -193,6 +221,25 @@
   </div>
 </div>
 
+<!-- 이어폰 확인 -->
+<div class="overlay hidden" id="earModal">
+  <div class="card">
+    <div class="big-emoji">🎧</div>
+    <h2 style="text-align:center">이어폰 끼셨나요?</h2>
+    <p id="earWhy" style="text-align:center">상사 욕이 스피커로 나가면 큰일나요.<br>이어폰을 연결한 뒤 눌러주세요.</p>
+    <div class="row"><button class="btn primary" id="earOk">🎧 꼈어요</button></div>
+    <div class="row"><button class="btn" id="earLater">아직이요 (소리 끔)</button></div>
+    <p class="small" style="text-align:center">이어폰이 빠지거나 다른 앱으로 가면 소리를 바로 멈추고 다시 물어볼게요.</p>
+  </div>
+</div>
+
+<!-- 위장 화면 -->
+<div id="disguise" class="hidden" aria-hidden="true">
+  <div class="dg-top" id="dgTitle"><b>업무 메모</b><span id="dgDate"></span></div>
+  <ul id="dgList"></ul>
+  <form class="dg-new" id="dgForm" autocomplete="off"><input id="dgInput" placeholder="할 일 추가"><button>추가</button></form>
+</div>
+
 <div id="toast"></div>
 
 <script>
@@ -206,7 +253,13 @@
     set(k, v) { try { localStorage.setItem(k, v); return true; } catch { return false; } },
     del(k) { try { localStorage.removeItem(k); } catch {} },
   };
-  const K = { sample: 'de.sample', pitch: 'de.f0', elKey: 'de.elKey', elVoice: 'de.elVoice' };
+  const K = { sample: 'de.sample', pitch: 'de.f0', elKey: 'de.elKey', elVoice: 'de.elVoice',
+    phrases: 'de.phrases', boss: 'de.boss', echo: 'de.echo', returnHide: 'de.returnHide' };
+  const opt = {
+    get echo() { return store.get(K.echo) !== '0'; },
+    get returnHide() { return store.get(K.returnHide) === '1'; },
+    get boss() { return store.get(K.boss) || ''; },
+  };
 
   // ---------- 토스트 ----------
   let toastTimer;
@@ -229,7 +282,7 @@
   function initAudio() {
     if (ctx) { if (ctx.state === 'suspended') ctx.resume(); return; }
     ctx = new (window.AudioContext || window.webkitAudioContext)();
-    master = ctx.createGain(); master.gain.value = 0.9;
+    master = ctx.createGain(); master.gain.value = 0.75;
     outAnalyser = ctx.createAnalyser(); outAnalyser.fftSize = 1024;
     master.connect(outAnalyser); outAnalyser.connect(ctx.destination);
 
@@ -276,9 +329,9 @@
   // 오디오 버퍼를 메아리로: 원음 → 왼쪽 대나무가 속삭임 → 오른쪽 대나무가 더 작게 속삭임
   function playEcho(buffer) {
     initAudio(); stopPlayback();
-    const pb = newOutput(), echoIn = makeEchoChain(pb.out);
+    const pb = newOutput(), echoIn = opt.echo ? makeEchoChain(pb.out) : pb.out;
     const t0 = ctx.currentTime + 0.05;
-    const plan = [ { g: 1, pan: 0, rate: 1 }, { g: 0.4, pan: -0.7, rate: 0.97 }, { g: 0.16, pan: 0.7, rate: 0.94 } ];
+    const plan = opt.echo ? [ { g: 1, pan: 0, rate: 1 }, { g: 0.4, pan: -0.7, rate: 0.97 }, { g: 0.16, pan: 0.7, rate: 0.94 } ] : [ { g: 1, pan: 0, rate: 1 } ];
     let t = t0;
     plan.forEach((p, i) => {
       const src = ctx.createBufferSource(); src.buffer = buffer; src.playbackRate.value = p.rate;
@@ -289,14 +342,15 @@
       src.start(t); pb.sources.push(src);
       t += buffer.duration / p.rate + 0.5;
     });
-    return (t - ctx.currentTime) + 2.5; // 대략 끝나는 시간(초)
+    return (t - ctx.currentTime) + (opt.echo ? 2.5 : 0.3); // 대략 끝나는 시간(초)
   }
 
   // ---------- 마이크 / 녹음 ----------
-  let micStream, micAnalyser;
+  let micStream, micAnalyser, lastMicChange = 0;
   async function getMic() {
     if (micStream && micStream.active) return micStream;
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) throw new Error('이 브라우저는 마이크를 지원하지 않아요');
+    lastMicChange = Date.now();
     micStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
     initAudio();
     micAnalyser = ctx.createAnalyser(); micAnalyser.fftSize = 1024;
@@ -305,7 +359,7 @@
   }
   // 녹음이 끝나면 마이크를 꺼서 (특히 아이폰) 스피커 볼륨이 정상으로 돌아오게
   function releaseMic() {
-    if (micStream) micStream.getTracks().forEach((t) => t.stop());
+    if (micStream) { micStream.getTracks().forEach((t) => t.stop()); lastMicChange = Date.now(); }
     micStream = null; micAnalyser = null;
   }
   function pickMime() {
@@ -389,7 +443,7 @@
     const pitch = voice.f0 ? Math.max(0.3, Math.min(1.7, voice.f0 / 200)) : 1;
     stopPlayback();
     const token = playToken;
-    const reps = [ { vol: 1, rate: 1 }, { vol: 0.45, rate: 0.9 }, { vol: 0.18, rate: 0.82 } ];
+    const reps = opt.echo ? [ { vol: 1, rate: 1 }, { vol: 0.45, rate: 0.9 }, { vol: 0.18, rate: 0.82 } ] : [ { vol: 1, rate: 1 } ];
     reps.forEach((r, i) => {
       const u = new SpeechSynthesisUtterance(text);
       u.lang = 'ko-KR'; if (ko[0]) u.voice = ko[0];
@@ -398,7 +452,7 @@
       if (i === reps.length - 1) u.onend = u.onerror = () => { if (token === playToken) ttsSpeaking = false; };
       synth.speak(u);
     });
-    return text.length * 0.18 * 3 + 2;
+    return text.length * 0.18 * reps.length + 1;
   }
 
   // ElevenLabs: 목소리 복제 + 합성
@@ -431,6 +485,7 @@
   let aiOk = false, pendingText = '';
   async function shoutText(text) {
     text = text.trim(); if (!text) return;
+    if (!earGate(() => shoutText(text))) return;
     if (voice.mode !== 'clone' && !aiOk) {
       // 녹음만으로는 글을 내 목소리로 못 읽으니, 어떻게 할지 묻기
       pendingText = text;
@@ -468,6 +523,7 @@
       try {
         const buf = await blobToBuffer(blob);
         await new Promise((r) => setTimeout(r, 250)); // 음성인식 결과 대기
+        if (!earOk) { toast('🎧 이어폰 확인 전이라 소리는 내지 않았어요'); return; }
         const caption = recogText.trim() || '(속 시원한 외침)';
         spawnWords(caption);
         buried++; $('#countText').textContent = `묻은 말 ${buried}개`;
@@ -572,6 +628,7 @@
   async function playPreview() {
     if (previewing) { stopPlayback(); return; }
     if (!previewBlob) return;
+    if (!earGate(playPreview)) return;
     try {
       const buf = await blobToBuffer(previewBlob);
       stopPlayback();
@@ -584,6 +641,136 @@
       s.addEventListener('ended', () => clearInterval(watch));
       s.start();
     } catch { toast('녹음을 재생하지 못했어요'); }
+  }
+
+  // ---------- 🎧 스피커 사고 방지 ----------
+  // 브라우저는 이어폰 연결 여부를 확실히 알 수 없어서: 사용 전에 확인받고,
+  // 소리 장치가 바뀌거나(이어폰 빠짐) 화면을 벗어나면 즉시 멈추고 다시 확인받는다.
+  let earOk = false, earPending = null;
+  function earGate(retry) {
+    if (earOk) return true;
+    earPending = retry || null;
+    showEar();
+    return false;
+  }
+  function showEar(why) {
+    $('#earWhy').innerHTML = why || '상사 욕이 스피커로 나가면 큰일나요.<br>이어폰을 연결한 뒤 눌러주세요.';
+    $('#earModal').classList.remove('hidden');
+  }
+  function earLost(why) {
+    if (!earOk && $('#earModal').classList.contains('hidden') === false) return;
+    stopPlayback();
+    earOk = false;
+    showEar(why);
+  }
+  if (navigator.mediaDevices && navigator.mediaDevices.addEventListener) {
+    navigator.mediaDevices.addEventListener('devicechange', () => {
+      if (Date.now() - lastMicChange < 2500) return; // 마이크를 켜고 끄며 생긴 변화
+      if (!earOk) return;
+      earLost('🎧 소리 장치가 바뀌었어요 (이어폰이 빠졌나요?)<br>소리를 멈췄어요. 이어폰을 다시 확인해주세요.');
+    });
+  }
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      stopPlayback();
+      discardShout();
+      cancelVoiceRec('화면을 벗어나서 녹음을 취소했어요.');
+      if (opt.returnHide && $('#intro').classList.contains('hidden')) hideNow();
+    } else if (earOk) {
+      earOk = false; // 돌아오면 다시 확인 (그 사이 이어폰을 뺐을 수 있음)
+    }
+  });
+  window.addEventListener('pagehide', stopPlayback);
+  // 외치던 녹음을 재생하지 않고 버림
+  function discardShout() {
+    if (!shoutRec) return;
+    const r = shoutRec; shoutRec = null;
+    if (recog) { try { recog.abort(); } catch {} }
+    $('#shout').classList.remove('rec'); $('#shout').textContent = '📣';
+    r.stop().then(releaseMic, releaseMic);
+  }
+
+  // ---------- 🙈 위장 화면 ----------
+  const DG_ITEMS = [
+    ['4분기 실적 보고서 초안 검토', '오늘 17:00까지'],
+    ['주간 회의록 정리 후 공유', '팀 채널'],
+    ['거래처 견적서 회신', '메일 확인'],
+    ['출장 경비 정산 영수증 첨부', ''],
+    ['다음 주 일정 조율', '캘린더'],
+  ];
+  function renderDisguise() {
+    const d = new Date();
+    $('#dgDate').textContent = `${d.getMonth() + 1}월 ${d.getDate()}일`;
+    const ul = $('#dgList');
+    if (ul.children.length) return;
+    DG_ITEMS.forEach(([t, sub], i) => {
+      const li = document.createElement('li');
+      li.innerHTML = `<input type="checkbox" ${i === 2 ? 'checked' : ''}><div></div>`;
+      li.querySelector('div').textContent = t;
+      if (sub) { const sm = document.createElement('small'); sm.textContent = sub; li.querySelector('div').appendChild(sm); }
+      ul.appendChild(li);
+    });
+  }
+  let realTitle = document.title, hideHintShown = false;
+  function hideNow() {
+    stopPlayback();
+    discardShout();
+    cancelVoiceRec('숨기기로 녹음을 취소했어요.');
+    document.activeElement && document.activeElement.blur();
+    renderDisguise();
+    $('#disguise').classList.remove('hidden');
+    document.title = '업무 메모';
+    if (!hideHintShown) { hideHintShown = true; setTimeout(() => toast('돌아가려면 맨 위 "업무 메모"를 길게 누르세요', 2500), 400); }
+  }
+  function unhide() {
+    $('#disguise').classList.add('hidden');
+    document.title = realTitle;
+  }
+  // 돌아가기: 제목 길게 누르기 (0.7초)
+  (() => {
+    let timer = null;
+    const el = $('#dgTitle');
+    const start = (e) => { e.preventDefault(); clearTimeout(timer); timer = setTimeout(unhide, 700); };
+    const cancel = () => clearTimeout(timer);
+    el.addEventListener('pointerdown', start);
+    ['pointerup', 'pointerleave', 'pointercancel'].forEach((ev) => el.addEventListener(ev, cancel));
+    el.addEventListener('contextmenu', (e) => e.preventDefault());
+  })();
+  $('#dgForm').onsubmit = (e) => {
+    e.preventDefault();
+    const v = $('#dgInput').value.trim(); if (!v) return;
+    const li = document.createElement('li'); li.innerHTML = '<input type="checkbox"><div></div>';
+    li.querySelector('div').textContent = v; $('#dgList').prepend(li); $('#dgInput').value = '';
+  };
+  $('#panic').onclick = hideNow;
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { if ($('#disguise').classList.contains('hidden')) hideNow(); }
+  });
+
+  // ---------- ⚡ 빠른 문장 (저장/삭제, {이름} 자동 채우기) ----------
+  const DEFAULT_PHRASES = ['{이름} 진짜 너무하네!', '{이름} 퇴근 좀 시켜줘라 제발', '회의 또 해? 미쳤어?', '이걸 지금 나한테 시킨다고?', '임금님 귀는 당나귀 귀!'];
+  function loadPhrases() {
+    try { const a = JSON.parse(store.get(K.phrases) || 'null'); if (Array.isArray(a)) return a; } catch {}
+    return DEFAULT_PHRASES.slice();
+  }
+  let phrases = loadPhrases(), editPhrases = false;
+  const savePhrases = () => store.set(K.phrases, JSON.stringify(phrases));
+  const fill = (t) => t.replace(/\{이름\}/g, opt.boss || '부장님');
+  function renderQuick() {
+    const q = $('#quick'); q.innerHTML = '';
+    const mk = (label, cls, fn) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'chip ' + cls; b.textContent = label; b.onclick = fn; q.appendChild(b); return b; };
+    phrases.forEach((p, i) => mk((editPhrases ? '✕ ' : '') + fill(p), editPhrases ? 'edit' : '', () => {
+      if (editPhrases) { phrases.splice(i, 1); savePhrases(); renderQuick(); }
+      else shoutText(fill(p));
+    }));
+    mk('＋ 저장', 'tool', () => {
+      const v = $('#msg').value.trim();
+      if (!v) { toast('입력창에 문장을 쓰고 ＋ 저장을 누르세요'); $('#msg').focus(); return; }
+      const boss = opt.boss;
+      phrases.unshift(boss ? v.split(boss).join('{이름}') : v); phrases = phrases.slice(0, 20);
+      savePhrases(); $('#msg').value = ''; renderQuick(); toast('⚡ 빠른 문장에 저장했어요');
+    });
+    mk(editPhrases ? '완료' : '✎ 편집', 'tool', () => { editPhrases = !editPhrases; renderQuick(); });
   }
 
   // ---------- 화면: 밤의 대나무숲 ----------
@@ -720,10 +907,17 @@
   }
 
   // ---------- 이벤트 ----------
-  $('#enter').onclick = () => { initAudio(); $('#intro').classList.add('hidden'); $('#msg').focus(); if (voice.mode === 'none') setTimeout(openVoice, 400); };
+  $('#enter').onclick = () => { initAudio(); $('#intro').classList.add('hidden'); showEar(); };
+  $('#earOk').onclick = () => {
+    initAudio(); earOk = true; $('#earModal').classList.add('hidden');
+    const next = earPending; earPending = null;
+    const first = !openVoice.prompted; openVoice.prompted = true; // 목소리 등록 안내는 처음 한 번만
+    if (next) next();
+    else if (first && voice.mode === 'none') setTimeout(openVoice, 300);
+  };
+  $('#earLater').onclick = () => { earPending = null; $('#earModal').classList.add('hidden'); toast('🔇 이어폰 확인 전까지 소리는 나지 않아요'); };
   $('#chat').onsubmit = (e) => { e.preventDefault(); const v = $('#msg').value; $('#msg').value = ''; shoutText(v); };
   $('#shout').onclick = toggleShout;
-  document.querySelectorAll('#quick .chip').forEach((b) => { b.onclick = () => shoutText(b.textContent); });
   $('#blowAway').onclick = () => {
     words.forEach((w) => { w.vy = -3; w.a *= 0.9; w.main = false; });
     stopPlayback();
@@ -751,7 +945,12 @@
   };
   $('#cloneAi').onclick = () => { $('#cloneModal').classList.add('hidden'); aiOk = true; toast('이번 방문 동안 글은 AI 음성으로 읽어요'); shoutText(pendingText); };
   $('#cloneShout').onclick = () => { $('#cloneModal').classList.add('hidden'); toggleShout(); };
-  $('#openSettings').onclick = () => { $('#elKey').value = voice.elKey; $('#settingsStatus').textContent = ''; $('#settingsModal').classList.remove('hidden'); };
+  $('#bossName').oninput = (e) => { store.set(K.boss, e.target.value.trim()); renderQuick(); };
+  $('#optEcho').onchange = (e) => store.set(K.echo, e.target.checked ? '1' : '0');
+  $('#optReturnHide').onchange = (e) => store.set(K.returnHide, e.target.checked ? '1' : '0');
+  $('#openSettings').onclick = () => {
+    $('#bossName').value = opt.boss; $('#optEcho').checked = opt.echo; $('#optReturnHide').checked = opt.returnHide;
+    $('#elKey').value = voice.elKey; $('#settingsStatus').textContent = ''; $('#settingsModal').classList.remove('hidden'); };
   $('#settingsClose').onclick = () => $('#settingsModal').classList.add('hidden');
   $('#elSave').onclick = () => {
     const k = $('#elKey').value.trim();
@@ -763,6 +962,7 @@
     const st = $('#settingsStatus');
     if (!voice.elKey) { st.textContent = '먼저 키를 저장해주세요'; return; }
     if (!voice.sampleBlob) { st.textContent = '🎙 내 목소리를 먼저 등록해주세요'; return; }
+    if (!earGate(() => $('#elTest').click())) return;
     $('#elTest').disabled = true; st.textContent = '목소리 복제·합성 중… (처음엔 10초쯤 걸려요)';
     try {
       initAudio();
@@ -776,7 +976,7 @@
   if ('speechSynthesis' in window) speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
 
   window.addEventListener('resize', resize);
-  resize(); loadSample(); requestAnimationFrame(draw);
+  resize(); loadSample(); renderQuick(); requestAnimationFrame(draw);
 })();
 </script>
 </body>
