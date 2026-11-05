@@ -1,0 +1,638 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>임금님 귀는 당나귀 귀</title>
+<meta name="description" content="대나무숲에 외치면 내 목소리로 메아리가 돌아오는 비밀 공간">
+<style>
+  :root {
+    --ink: #eaf5e4;
+    --ink-dim: #a8bfa3;
+    --panel: rgba(10, 24, 16, 0.82);
+    --line: rgba(180, 230, 170, 0.18);
+    --accent: #c9f27a;
+    --accent-ink: #13240c;
+    --danger: #ff8a7a;
+    --bg: #050d09;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink);
+    font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif;
+    overflow: hidden; -webkit-tap-highlight-color: transparent; }
+  canvas#forest { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+  button { font: inherit; color: inherit; cursor: pointer; border: 0; }
+  .hidden { display: none !important; }
+
+  /* 상단 바 */
+  header { position: fixed; top: 0; left: 0; right: 0; display: flex; align-items: center;
+    justify-content: space-between; gap: 8px;
+    padding: calc(12px + env(safe-area-inset-top)) 16px 12px; z-index: 5;
+    background: linear-gradient(rgba(5,13,9,.85), rgba(5,13,9,0)); }
+  header h1 { font-size: 17px; margin: 0; letter-spacing: -0.02em; white-space: nowrap; }
+  header h1 small { display: block; font-size: 11px; font-weight: 400; color: var(--ink-dim); margin-top: 2px; }
+  .top-btns { display: flex; gap: 6px; }
+  .chip { background: rgba(255,255,255,.08); border: 1px solid var(--line); border-radius: 999px;
+    padding: 7px 11px; font-size: 13px; white-space: nowrap; }
+  .chip:hover { background: rgba(255,255,255,.14); }
+
+  /* 엔진 상태 */
+  #engine { position: fixed; top: calc(64px + env(safe-area-inset-top)); left: 16px; z-index: 4;
+    font-size: 12px; color: var(--ink-dim); background: rgba(0,0,0,.35); padding: 5px 10px;
+    border-radius: 999px; border: 1px solid var(--line); }
+
+  /* 하단 채팅 */
+  #bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 5;
+    padding: 12px 16px calc(14px + env(safe-area-inset-bottom));
+    background: linear-gradient(rgba(5,13,9,0), rgba(5,13,9,.92) 40%); }
+  #bar form { display: flex; gap: 8px; max-width: 720px; margin: 0 auto; }
+  #msg { flex: 1; min-width: 0; background: rgba(255,255,255,.08); border: 1px solid var(--line);
+    color: var(--ink); border-radius: 14px; padding: 13px 14px; font: inherit; font-size: 16px; outline: none; }
+  #msg:focus { border-color: var(--accent); }
+  #send { background: var(--accent); color: var(--accent-ink); font-weight: 700;
+    border-radius: 14px; padding: 0 16px; white-space: nowrap; }
+  #shout { width: 50px; border-radius: 14px; background: rgba(255,255,255,.1);
+    border: 1px solid var(--line); font-size: 20px; flex: none; }
+  #shout.rec { background: var(--danger); animation: pulse 1s infinite; }
+  @keyframes pulse { 50% { transform: scale(1.06); } }
+  #hint { text-align: center; font-size: 12px; color: var(--ink-dim); margin: 8px 0 0; }
+  #count { position: fixed; right: 16px; top: calc(64px + env(safe-area-inset-top)); z-index: 4;
+    font-size: 12px; color: var(--ink-dim); display: flex; gap: 6px; align-items: center; }
+
+  /* 모달 */
+  .overlay { position: fixed; inset: 0; z-index: 10; display: flex; align-items: center; justify-content: center;
+    padding: 16px; background: rgba(0,0,0,.55); backdrop-filter: blur(3px); }
+  .card { width: 100%; max-width: 440px; max-height: 92vh; overflow-y: auto; background: var(--panel);
+    border: 1px solid var(--line); border-radius: 20px; padding: 22px 20px; }
+  .card h2 { margin: 0 0 10px; font-size: 20px; letter-spacing: -0.02em; }
+  .card p { margin: 8px 0; line-height: 1.6; color: var(--ink-dim); font-size: 14px; }
+  .card .script { background: rgba(255,255,255,.06); border-left: 3px solid var(--accent);
+    padding: 12px 14px; border-radius: 8px; color: var(--ink); line-height: 1.7; font-size: 15px; }
+  .row { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+  .btn { flex: 1; padding: 12px 14px; border-radius: 12px; background: rgba(255,255,255,.1);
+    border: 1px solid var(--line); font-weight: 600; min-width: 110px; }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
+  .btn.danger { color: var(--danger); }
+  .btn:disabled { opacity: .4; cursor: default; }
+  .meter { height: 8px; border-radius: 99px; background: rgba(255,255,255,.08); overflow: hidden; margin-top: 12px; }
+  .meter i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .05s; }
+  .status { font-size: 13px; color: var(--ink); margin-top: 10px; min-height: 20px; }
+  label.field { display: block; font-size: 13px; color: var(--ink-dim); margin-top: 12px; }
+  label.field input { display: block; width: 100%; margin-top: 6px; background: rgba(255,255,255,.08);
+    border: 1px solid var(--line); color: var(--ink); border-radius: 10px; padding: 11px 12px; font: inherit; font-size: 15px; }
+  .intro h2 { font-size: 26px; }
+  .intro .ears { font-size: 54px; text-align: center; margin-bottom: 4px; }
+  .small { font-size: 12px !important; }
+
+  #toast { position: fixed; left: 50%; bottom: 110px; transform: translateX(-50%); z-index: 20;
+    background: rgba(0,0,0,.8); border: 1px solid var(--line); padding: 10px 14px; border-radius: 12px;
+    font-size: 13px; max-width: calc(100% - 32px); text-align: center; opacity: 0; transition: opacity .25s; pointer-events: none; }
+  #toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+<canvas id="forest"></canvas>
+
+<header>
+  <h1>🫏 임금님 귀는 당나귀 귀<small>대나무숲은 비밀을 지켜요</small></h1>
+  <div class="top-btns">
+    <button class="chip" id="openVoice">🎙 내 목소리</button>
+    <button class="chip" id="openSettings" aria-label="설정">⚙</button>
+  </div>
+</header>
+
+<div id="engine">목소리 미등록</div>
+<div id="count"><span id="countText">묻은 말 0개</span><button class="chip" id="blowAway">🍃 날려보내기</button></div>
+
+<div id="bar">
+  <form id="chat" autocomplete="off">
+    <button type="button" id="shout" title="눌러서 외치고, 다시 눌러서 멈추기">📣</button>
+    <input id="msg" maxlength="200" placeholder="아무도 안 들어요. 속 시원하게 외쳐보세요">
+    <button id="send" type="submit">외치기</button>
+  </form>
+  <p id="hint">글을 쓰면 내 목소리로, 📣를 누르면 내 육성 그대로 숲에 메아리쳐요</p>
+</div>
+
+<!-- 인트로 -->
+<div class="overlay" id="intro">
+  <div class="card intro">
+    <div class="ears">🫏</div>
+    <h2>임금님 귀는 당나귀 귀</h2>
+    <p>임금님의 비밀을 알게 된 복두장이는 끝내 참지 못하고 대나무숲에 들어가 외쳤어요. <b style="color:var(--ink)">"임금님 귀는 당나귀 귀!"</b></p>
+    <p>여기는 그 대나무숲이에요. 상사, 친구, 전 애인, 세상 누구든 실컷 욕하고 뒷담화해도 괜찮아요. 숲은 당신 목소리로 메아리만 돌려줄 뿐이에요.</p>
+    <p class="small">🔒 여기서 한 말은 서버로 가지 않고, 창을 닫으면 사라져요. 목소리 샘플만 이 기기에 저장돼요.</p>
+    <div class="row"><button class="btn primary" id="enter">숲으로 들어가기</button></div>
+  </div>
+</div>
+
+<!-- 목소리 등록 -->
+<div class="overlay hidden" id="voiceModal">
+  <div class="card">
+    <h2>🎙 내 목소리 등록</h2>
+    <p>아래 문장을 평소 목소리로 읽어주세요. 10초 이상이면 좋아요.</p>
+    <div class="script">옛날 옛적, 임금님의 귀가 당나귀 귀라는 걸 아는 사람이 있었어요. 너무 말하고 싶어서 참다 참다 대나무숲에 들어가 있는 힘껏 외쳤답니다. 임금님 귀는 당나귀 귀! 속이 다 시원하네!</div>
+    <div class="meter"><i id="voiceMeter"></i></div>
+    <div class="status" id="voiceStatus"></div>
+    <div class="row">
+      <button class="btn primary" id="voiceRec">● 녹음 시작</button>
+      <button class="btn" id="voicePlay" disabled>▶ 들어보기</button>
+    </div>
+    <div class="row">
+      <button class="btn danger" id="voiceDelete">목소리 삭제</button>
+      <button class="btn" id="voiceClose">닫기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 설정 -->
+<div class="overlay hidden" id="settingsModal">
+  <div class="card">
+    <h2>⚙ 진짜 내 목소리로 말하기</h2>
+    <p>기본 모드는 휴대폰/PC에 내장된 한국어 음성을 <b style="color:var(--ink)">내 음높이에 맞춰</b> 바꾸는 방식이라 "비슷한 톤"까지만 돼요.</p>
+    <p>ElevenLabs API 키를 넣으면 등록한 샘플로 <b style="color:var(--ink)">목소리를 복제</b>해서, 쓴 글을 진짜 내 목소리로 읽어줘요.</p>
+    <p class="small">⚠ 이 모드에선 목소리 샘플과 입력한 글이 ElevenLabs로 전송돼요. 키는 이 기기 브라우저에만 저장돼요.</p>
+    <label class="field">ElevenLabs API 키
+      <input id="elKey" type="password" placeholder="sk_..." autocomplete="off">
+    </label>
+    <div class="status" id="settingsStatus"></div>
+    <div class="row">
+      <button class="btn danger" id="elClear">키 지우기</button>
+      <button class="btn primary" id="elSave">저장</button>
+    </div>
+    <div class="row"><button class="btn" id="settingsClose">닫기</button></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+(() => {
+  'use strict';
+  const $ = (s) => document.querySelector(s);
+
+  // ---------- 저장소 (실패해도 동작하도록) ----------
+  const store = {
+    get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+    set(k, v) { try { localStorage.setItem(k, v); return true; } catch { return false; } },
+    del(k) { try { localStorage.removeItem(k); } catch {} },
+  };
+  const K = { sample: 'de.sample', pitch: 'de.f0', elKey: 'de.elKey', elVoice: 'de.elVoice' };
+
+  // ---------- 토스트 ----------
+  let toastTimer;
+  function toast(text, ms = 2600) {
+    const el = $('#toast'); el.textContent = text; el.classList.add('show');
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('show'), ms);
+  }
+
+  // ---------- 오디오 그래프: 대나무숲 메아리 ----------
+  let ctx, master, outAnalyser, echoIn;
+  function makeImpulse(seconds, decay) {
+    const len = Math.floor(ctx.sampleRate * seconds);
+    const buf = ctx.createBuffer(2, len, ctx.sampleRate);
+    for (let c = 0; c < 2; c++) {
+      const d = buf.getChannelData(c);
+      for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, decay);
+    }
+    return buf;
+  }
+  function initAudio() {
+    if (ctx) { if (ctx.state === 'suspended') ctx.resume(); return; }
+    ctx = new (window.AudioContext || window.webkitAudioContext)();
+    master = ctx.createGain(); master.gain.value = 0.9;
+    outAnalyser = ctx.createAnalyser(); outAnalyser.fftSize = 1024;
+    master.connect(outAnalyser); outAnalyser.connect(ctx.destination);
+
+    echoIn = ctx.createGain();
+    // 원음
+    const dry = ctx.createGain(); dry.gain.value = 0.85;
+    echoIn.connect(dry); dry.connect(master);
+    // 반복 메아리 (딜레이 + 피드백, 점점 먹먹해지도록 로우패스)
+    const delay = ctx.createDelay(2); delay.delayTime.value = 0.45;
+    const fb = ctx.createGain(); fb.gain.value = 0.48;
+    const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 2000;
+    const wet = ctx.createGain(); wet.gain.value = 0.75;
+    echoIn.connect(delay); delay.connect(lp); lp.connect(fb); fb.connect(delay);
+    lp.connect(wet); wet.connect(master);
+    // 숲의 잔향
+    const conv = ctx.createConvolver(); conv.buffer = makeImpulse(3.4, 2.6);
+    const rv = ctx.createGain(); rv.gain.value = 0.4;
+    echoIn.connect(conv); conv.connect(rv); rv.connect(master);
+  }
+
+  // 오디오 버퍼를 메아리로: 원음 → 왼쪽 대나무가 속삭임 → 오른쪽 대나무가 더 작게 속삭임
+  function playEcho(buffer) {
+    initAudio();
+    const t0 = ctx.currentTime + 0.05;
+    const plan = [ { g: 1, pan: 0, rate: 1 }, { g: 0.4, pan: -0.7, rate: 0.97 }, { g: 0.16, pan: 0.7, rate: 0.94 } ];
+    let t = t0;
+    plan.forEach((p, i) => {
+      const src = ctx.createBufferSource(); src.buffer = buffer; src.playbackRate.value = p.rate;
+      const g = ctx.createGain(); g.gain.value = p.g;
+      const pan = ctx.createStereoPanner ? ctx.createStereoPanner() : null;
+      src.connect(g);
+      if (pan) { pan.pan.value = p.pan; g.connect(pan); pan.connect(echoIn); } else g.connect(echoIn);
+      src.start(t);
+      t += buffer.duration / p.rate + 0.5;
+    });
+    return (t - ctx.currentTime) + 2.5; // 대략 끝나는 시간(초)
+  }
+
+  // ---------- 마이크 / 녹음 ----------
+  let micStream, micAnalyser;
+  async function getMic() {
+    if (micStream && micStream.active) return micStream;
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) throw new Error('이 브라우저는 마이크를 지원하지 않아요');
+    micStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
+    initAudio();
+    micAnalyser = ctx.createAnalyser(); micAnalyser.fftSize = 1024;
+    ctx.createMediaStreamSource(micStream).connect(micAnalyser); // 스피커로는 안 보냄
+    return micStream;
+  }
+  function pickMime() {
+    if (!window.MediaRecorder) return null;
+    for (const m of ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg;codecs=opus'])
+      if (MediaRecorder.isTypeSupported(m)) return m;
+    return '';
+  }
+  function startRecording(stream) {
+    const mime = pickMime();
+    if (mime === null) throw new Error('이 브라우저는 녹음을 지원하지 않아요');
+    const rec = new MediaRecorder(stream, mime ? { mimeType: mime } : undefined);
+    const chunks = [];
+    rec.ondataavailable = (e) => { if (e.data && e.data.size) chunks.push(e.data); };
+    const done = new Promise((res) => { rec.onstop = () => res(new Blob(chunks, { type: rec.mimeType || mime || 'audio/webm' })); });
+    rec.start();
+    const started = performance.now();
+    return { stop() { if (rec.state !== 'inactive') rec.stop(); return done; }, elapsed: () => (performance.now() - started) / 1000 };
+  }
+  function levelOf(an) {
+    if (!an) return 0;
+    const d = new Uint8Array(an.fftSize); an.getByteTimeDomainData(d);
+    let s = 0; for (let i = 0; i < d.length; i++) { const v = (d[i] - 128) / 128; s += v * v; }
+    return Math.min(1, Math.sqrt(s / d.length) * 4);
+  }
+  async function blobToBuffer(blob) {
+    initAudio();
+    const ab = await blob.arrayBuffer();
+    return await new Promise((res, rej) => ctx.decodeAudioData(ab, res, rej));
+  }
+  const blobToDataURL = (blob) => new Promise((res) => { const r = new FileReader(); r.onload = () => res(r.result); r.readAsDataURL(blob); });
+  const dataURLToBlob = async (url) => (await fetch(url)).blob();
+
+  // ---------- 음높이 추정 (자기상관) ----------
+  function estimatePitch(buffer) {
+    const data = buffer.getChannelData(0), sr = buffer.sampleRate, size = 2048;
+    const minLag = Math.floor(sr / 400), maxLag = Math.floor(sr / 70);
+    const f0s = [];
+    for (let i = 0; i + size < data.length; i += size * 2) {
+      const fr = data.subarray(i, i + size);
+      let e = 0; for (let j = 0; j < size; j++) e += fr[j] * fr[j];
+      if (Math.sqrt(e / size) < 0.015) continue; // 무음 프레임 제외
+      let best = 0, bestLag = 0;
+      for (let lag = minLag; lag <= maxLag; lag++) {
+        let s = 0; for (let j = 0; j < size - lag; j += 2) s += fr[j] * fr[j + lag];
+        s = s * 2 / (size - lag);
+        if (s > best) { best = s; bestLag = lag; }
+      }
+      if (bestLag && best / (e / size) > 0.45) f0s.push(sr / bestLag);
+    }
+    if (f0s.length < 3) return null;
+    f0s.sort((a, b) => a - b);
+    return Math.round(f0s[f0s.length >> 1]);
+  }
+
+  // ---------- 음성 엔진 ----------
+  const voice = {
+    sampleBlob: null,
+    f0: Number(store.get(K.pitch)) || null,
+    get elKey() { return store.get(K.elKey) || ''; },
+    get mode() { return this.elKey && this.sampleBlob ? 'clone' : this.sampleBlob ? 'pitch' : 'none'; },
+  };
+  async function loadSample() {
+    const url = store.get(K.sample);
+    if (url) { try { voice.sampleBlob = await dataURLToBlob(url); } catch { voice.sampleBlob = null; } }
+    updateEngine();
+  }
+  function updateEngine() {
+    const el = $('#engine');
+    if (voice.mode === 'clone') el.textContent = '🟢 진짜 내 목소리 (복제)';
+    else if (voice.mode === 'pitch') el.textContent = `🟡 내 톤 흉내 · ${voice.f0 ? voice.f0 + 'Hz' : '기본 톤'}`;
+    else el.textContent = '⚪ 목소리 미등록 · 기본 음성';
+  }
+
+  // 기기 내장 TTS: 음높이를 내 목소리에 맞추고, 대나무가 점점 작게 따라 속삭이게
+  let ttsSpeaking = false;
+  function ttsEcho(text) {
+    if (!('speechSynthesis' in window)) { toast('이 브라우저는 음성 합성을 지원하지 않아요'); return 0; }
+    const synth = window.speechSynthesis;
+    const ko = synth.getVoices().filter((v) => /^ko/i.test(v.lang));
+    // 기본 한국어 음성은 대개 200Hz 안팎. 내 F0에 비례해 pitch(0~2) 조절
+    const pitch = voice.f0 ? Math.max(0.3, Math.min(1.7, voice.f0 / 200)) : 1;
+    synth.cancel();
+    const reps = [ { vol: 1, rate: 1 }, { vol: 0.45, rate: 0.9 }, { vol: 0.18, rate: 0.82 } ];
+    reps.forEach((r, i) => {
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'ko-KR'; if (ko[0]) u.voice = ko[0];
+      u.pitch = pitch; u.volume = r.vol; u.rate = r.rate;
+      if (i === 0) u.onstart = () => { ttsSpeaking = true; };
+      if (i === reps.length - 1) u.onend = u.onerror = () => { ttsSpeaking = false; };
+      synth.speak(u);
+    });
+    return text.length * 0.18 * 3 + 2;
+  }
+
+  // ElevenLabs: 목소리 복제 + 합성
+  function sampleExt(blob) { return /mp4/.test(blob.type) ? 'm4a' : /ogg/.test(blob.type) ? 'ogg' : 'webm'; }
+  async function elVoiceId() {
+    const cached = store.get(K.elVoice); if (cached) return cached;
+    toast('내 목소리를 복제하는 중… (처음 한 번만)', 6000);
+    const fd = new FormData();
+    fd.append('name', 'donkey-ears-' + Date.now());
+    fd.append('files', voice.sampleBlob, 'sample.' + sampleExt(voice.sampleBlob));
+    const r = await fetch('https://api.elevenlabs.io/v1/voices/add', { method: 'POST', headers: { 'xi-api-key': voice.elKey }, body: fd });
+    if (!r.ok) throw new Error('목소리 복제 실패 (' + r.status + ') ' + (await r.text()).slice(0, 120));
+    const id = (await r.json()).voice_id;
+    store.set(K.elVoice, id);
+    return id;
+  }
+  async function elSpeak(text) {
+    const id = await elVoiceId();
+    const r = await fetch('https://api.elevenlabs.io/v1/text-to-speech/' + encodeURIComponent(id), {
+      method: 'POST',
+      headers: { 'xi-api-key': voice.elKey, 'Content-Type': 'application/json', Accept: 'audio/mpeg' },
+      body: JSON.stringify({ text, model_id: 'eleven_multilingual_v2' }),
+    });
+    if (!r.ok) throw new Error('음성 합성 실패 (' + r.status + ')');
+    return blobToBuffer(await r.blob());
+  }
+
+  // ---------- 채팅 → 메아리 ----------
+  let buried = 0;
+  async function shoutText(text) {
+    text = text.trim(); if (!text) return;
+    initAudio();
+    spawnWords(text);
+    buried++; $('#countText').textContent = `묻은 말 ${buried}개`;
+    if (voice.mode === 'clone') {
+      try { const buf = await elSpeak(text); scheduleWhispers(text, playEcho(buf)); return; }
+      catch (e) { toast(e.message + ' → 기본 음성으로 대신할게요', 4000); }
+    }
+    if (voice.mode === 'none' && !shoutText.nudged) { shoutText.nudged = true; toast('🎙 내 목소리를 등록하면 내 톤으로 메아리쳐요'); }
+    scheduleWhispers(text, ttsEcho(text));
+  }
+
+  // ---------- 📣 육성 외치기 ----------
+  let shoutRec = null, recog = null, recogText = '';
+  async function toggleShout() {
+    const btn = $('#shout');
+    if (shoutRec) {
+      const rec = shoutRec; shoutRec = null; btn.classList.remove('rec'); btn.textContent = '📣';
+      if (recog) { try { recog.stop(); } catch {} }
+      const blob = await rec.stop();
+      try {
+        const buf = await blobToBuffer(blob);
+        await new Promise((r) => setTimeout(r, 250)); // 음성인식 결과 대기
+        const caption = recogText.trim() || '(속 시원한 외침)';
+        spawnWords(caption);
+        buried++; $('#countText').textContent = `묻은 말 ${buried}개`;
+        scheduleWhispers(caption, playEcho(buf));
+      } catch { toast('녹음을 재생하지 못했어요'); }
+      return;
+    }
+    try {
+      const stream = await getMic();
+      if (window.speechSynthesis) speechSynthesis.cancel();
+      shoutRec = startRecording(stream);
+      btn.classList.add('rec'); btn.textContent = '■';
+      toast('외치세요! 다 외쳤으면 ■ 를 눌러요');
+      recogText = '';
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (SR) {
+        recog = new SR(); recog.lang = 'ko-KR'; recog.continuous = true; recog.interimResults = false;
+        recog.onresult = (e) => { recogText = Array.from(e.results).map((r) => r[0].transcript).join(' '); };
+        recog.onerror = () => {};
+        try { recog.start(); } catch {}
+      }
+      setTimeout(() => { if (shoutRec) toggleShout(); }, 30000); // 최대 30초
+    } catch (e) { toast('마이크를 쓸 수 없어요: ' + (e.message || e.name)); }
+  }
+
+  // ---------- 목소리 등록 모달 ----------
+  let voiceRec = null, voiceTimer = null, previewBlob = null;
+  function openVoice() {
+    $('#voiceModal').classList.remove('hidden');
+    previewBlob = voice.sampleBlob;
+    $('#voicePlay').disabled = !previewBlob;
+    $('#voiceStatus').textContent = voice.sampleBlob ? `등록됨 · 내 음높이 약 ${voice.f0 || '?'}Hz` : '아직 등록된 목소리가 없어요';
+  }
+  async function toggleVoiceRec() {
+    const btn = $('#voiceRec');
+    if (voiceRec) {
+      const secs = voiceRec.elapsed();
+      clearInterval(voiceTimer);
+      const blob = await voiceRec.stop(); voiceRec = null;
+      btn.textContent = '● 다시 녹음';
+      $('#voiceMeter').style.width = '0';
+      if (secs < 4) { $('#voiceStatus').textContent = '너무 짧아요. 문장을 끝까지 읽어주세요.'; return; }
+      $('#voiceStatus').textContent = '분석 중…';
+      try {
+        const buf = await blobToBuffer(blob);
+        const f0 = estimatePitch(buf);
+        voice.sampleBlob = blob; voice.f0 = f0; previewBlob = blob;
+        store.set(K.pitch, f0 || '');
+        store.del(K.elVoice); // 새 샘플이면 복제 다시
+        const saved = store.set(K.sample, await blobToDataURL(blob));
+        $('#voicePlay').disabled = false;
+        $('#voiceStatus').textContent = `✅ 등록 완료 · 내 음높이 약 ${f0 || '?'}Hz` + (saved ? '' : ' (이 브라우저에선 저장이 안 돼서 이번만 쓸 수 있어요)');
+        updateEngine();
+      } catch { $('#voiceStatus').textContent = '녹음을 분석하지 못했어요. 다시 해주세요.'; }
+      return;
+    }
+    try {
+      const stream = await getMic();
+      voiceRec = startRecording(stream);
+      btn.textContent = '■ 녹음 끝내기';
+      voiceTimer = setInterval(() => {
+        const s = voiceRec ? voiceRec.elapsed() : 0;
+        $('#voiceStatus').textContent = `녹음 중… ${s.toFixed(1)}초`;
+        $('#voiceMeter').style.width = Math.round(levelOf(micAnalyser) * 100) + '%';
+        if (s >= 30) toggleVoiceRec();
+      }, 80);
+    } catch (e) { $('#voiceStatus').textContent = '마이크를 쓸 수 없어요: ' + (e.message || e.name); }
+  }
+  async function playPreview() {
+    if (!previewBlob) return;
+    try { const buf = await blobToBuffer(previewBlob); initAudio();
+      const s = ctx.createBufferSource(); s.buffer = buf; s.connect(master); s.start(); } catch {}
+  }
+
+  // ---------- 화면: 밤의 대나무숲 ----------
+  const cv = $('#forest'), g = cv.getContext('2d');
+  let W = 0, H = 0, DPR = 1, stalks = [], stars = [], flies = [], words = [], wind = 0;
+  function resize() {
+    DPR = Math.min(2, window.devicePixelRatio || 1);
+    W = window.innerWidth; H = window.innerHeight;
+    cv.width = W * DPR; cv.height = H * DPR; g.setTransform(DPR, 0, 0, DPR, 0, 0);
+    build();
+  }
+  function build() {
+    const n = Math.round(Math.max(22, W / 26));
+    stalks = [];
+    for (let i = 0; i < n; i++) {
+      const depth = Math.random(); // 0 멀리, 1 가까이
+      const x = Math.random() * W;
+      if (Math.abs(x - W / 2) < 70 + depth * 40 && depth > 0.5) continue; // 구멍 앞은 비워두기
+      stalks.push({ x, depth, w: 3 + depth * 9, h: H * (0.75 + Math.random() * 0.35),
+        ph: Math.random() * 6.28, sp: 0.5 + Math.random() * 0.6, seg: 50 + Math.random() * 40 + depth * 30 });
+    }
+    stalks.sort((a, b) => a.depth - b.depth);
+    stars = Array.from({ length: 70 }, () => ({ x: Math.random() * W, y: Math.random() * H * 0.45, r: Math.random() * 1.3 + 0.2, t: Math.random() * 6 }));
+    flies = Array.from({ length: 16 }, () => ({ x: Math.random() * W, y: H * (0.4 + Math.random() * 0.5), a: Math.random() * 6.28, s: 0.2 + Math.random() * 0.4 }));
+  }
+  const holeY = () => H * 0.74;
+
+  function spawnWords(text) {
+    words.push({ text, x: W / 2, y: holeY() - 10, vy: -0.55, a: 1, size: Math.min(26, Math.max(16, W / 22)), main: true, life: 0 });
+  }
+  // 메아리 시간 동안 대나무 사이에서 말이 흐릿하게 떠오름
+  function scheduleWhispers(text, seconds) {
+    const n = 3;
+    for (let i = 1; i <= n; i++) {
+      setTimeout(() => {
+        const side = i % 2 ? -1 : 1;
+        words.push({ text, x: W / 2 + side * (W * (0.18 + Math.random() * 0.15)), y: H * (0.3 + Math.random() * 0.25),
+          vy: -0.15, a: 0.55 / i, size: Math.max(12, 20 - i * 2), main: false, life: 0 });
+      }, Math.min(seconds, 9) * 1000 * (i / (n + 1)));
+    }
+  }
+
+  function draw(ts) {
+    const t = ts / 1000;
+    const lvl = Math.max(levelOf(outAnalyser), shoutRec || voiceRec ? levelOf(micAnalyser) : 0, ttsSpeaking ? 0.35 + 0.15 * Math.sin(t * 9) : 0);
+    wind += (lvl - wind) * 0.08;
+
+    // 하늘
+    const sky = g.createLinearGradient(0, 0, 0, H);
+    sky.addColorStop(0, '#071a24'); sky.addColorStop(0.55, '#0a2116'); sky.addColorStop(1, '#030806');
+    g.fillStyle = sky; g.fillRect(0, 0, W, H);
+    for (const s of stars) { g.globalAlpha = 0.4 + 0.4 * Math.sin(t * 1.5 + s.t); g.fillStyle = '#dff'; g.beginPath(); g.arc(s.x, s.y, s.r, 0, 7); g.fill(); }
+    g.globalAlpha = 1;
+    // 달
+    const mx = W * 0.78, my = H * 0.16, mr = Math.min(W, H) * 0.07;
+    const glow = g.createRadialGradient(mx, my, mr * 0.5, mx, my, mr * 4);
+    glow.addColorStop(0, 'rgba(250,245,200,.25)'); glow.addColorStop(1, 'rgba(250,245,200,0)');
+    g.fillStyle = glow; g.fillRect(mx - mr * 4, my - mr * 4, mr * 8, mr * 8);
+    g.fillStyle = '#f6f1cf'; g.beginPath(); g.arc(mx, my, mr, 0, 7); g.fill();
+
+    // 대나무 (뒤에서 앞으로)
+    const ground = holeY() + 30;
+    stalks.forEach((s, idx) => {
+      if (s.depth > 0.62 && !s._front) s._front = true;
+      if (s._front) return; // 앞쪽 대나무는 구멍 뒤에 그림
+      drawStalk(s, t, ground);
+    });
+
+    // 땅 + 구멍
+    const gr = g.createLinearGradient(0, ground - 60, 0, H);
+    gr.addColorStop(0, 'rgba(8,20,12,0)'); gr.addColorStop(0.3, '#08140c'); gr.addColorStop(1, '#020504');
+    g.fillStyle = gr; g.fillRect(0, ground - 60, W, H - ground + 60);
+    const hx = W / 2, hy = holeY(), hw = Math.min(110, W * 0.2);
+    const hg = g.createRadialGradient(hx, hy, 4, hx, hy, hw);
+    hg.addColorStop(0, '#000'); hg.addColorStop(0.7, '#020604'); hg.addColorStop(1, 'rgba(20,40,25,0)');
+    g.fillStyle = hg; g.beginPath(); g.ellipse(hx, hy, hw, hw * 0.32, 0, 0, 7); g.fill();
+    // 구멍에서 나오는 숨결
+    g.strokeStyle = `rgba(200,240,170,${0.08 + wind * 0.4})`; g.lineWidth = 2;
+    for (let i = 0; i < 3; i++) { const r = (t * 30 + i * 25) % 75; g.beginPath(); g.ellipse(hx, hy, hw * 0.4 + r, (hw * 0.4 + r) * 0.3, 0, 0, 7); g.globalAlpha = 1 - r / 75; g.stroke(); }
+    g.globalAlpha = 1;
+
+    stalks.forEach((s) => { if (s._front) drawStalk(s, t, ground); });
+
+    // 반딧불
+    for (const f of flies) {
+      f.a += (Math.random() - 0.5) * 0.3; f.x += Math.cos(f.a) * f.s * (1 + wind * 4); f.y += Math.sin(f.a) * f.s;
+      if (f.x < 0) f.x = W; if (f.x > W) f.x = 0; if (f.y < H * 0.3) f.y = H * 0.3; if (f.y > H * 0.95) f.y = H * 0.95;
+      g.fillStyle = `rgba(210,255,120,${0.4 + 0.4 * Math.sin(t * 3 + f.a)})`; g.beginPath(); g.arc(f.x, f.y, 1.8, 0, 7); g.fill();
+    }
+
+    // 떠오르는 말
+    g.textAlign = 'center'; g.textBaseline = 'middle';
+    words = words.filter((w) => w.a > 0.01);
+    for (const w of words) {
+      w.life++; w.y += w.vy; w.x += Math.sin((w.life + w.size) / 40) * 0.3 + wind * 0.8;
+      w.a *= w.main ? (w.life > 160 ? 0.985 : 1) : 0.992;
+      g.font = `${w.main ? 700 : 500} ${w.size}px "Pretendard","Apple SD Gothic Neo","Noto Sans KR",sans-serif`;
+      g.fillStyle = w.main ? `rgba(240,255,225,${w.a})` : `rgba(190,235,160,${w.a})`;
+      g.shadowColor = 'rgba(160,240,120,.6)'; g.shadowBlur = w.main ? 12 : 6;
+      wrapText(w.text, w.x, w.y, Math.min(W - 40, 520), w.size * 1.3);
+      g.shadowBlur = 0;
+    }
+    requestAnimationFrame(draw);
+  }
+  function drawStalk(s, t, ground) {
+    const shade = 20 + s.depth * 55;
+    const col = `rgb(${Math.round(shade * 0.55)},${Math.round(shade * 1.25)},${Math.round(shade * 0.6)})`;
+    const amp = (6 + s.depth * 8) * (1 + wind * 5);
+    const baseY = ground - (1 - s.depth) * 40;
+    const topY = baseY - s.h * (0.6 + s.depth * 0.4);
+    const sway = Math.sin(t * s.sp * (1 + wind * 2) + s.ph) * amp + wind * 25 * (s.x < W / 2 ? -1 : 1);
+    const pt = (y) => { const k = (baseY - y) / (baseY - topY); return s.x + sway * k * k; };
+    g.strokeStyle = col; g.lineWidth = s.w; g.lineCap = 'round';
+    g.beginPath(); g.moveTo(s.x, baseY);
+    for (let y = baseY; y > topY; y -= 20) g.lineTo(pt(y), y);
+    g.stroke();
+    // 마디
+    g.strokeStyle = `rgba(0,0,0,${0.25 + s.depth * 0.2})`; g.lineWidth = 1.5;
+    for (let y = baseY - s.seg; y > topY; y -= s.seg) { const x = pt(y); g.beginPath(); g.moveTo(x - s.w / 2, y); g.lineTo(x + s.w / 2, y); g.stroke(); }
+    // 잎
+    g.fillStyle = col;
+    for (let y = baseY - s.seg * 2; y > topY; y -= s.seg) {
+      const x = pt(y), dir = ((y / s.seg) | 0) % 2 ? 1 : -1;
+      const flutter = Math.sin(t * 3 * (1 + wind * 3) + y) * 0.25;
+      g.save(); g.translate(x, y); g.rotate(dir * (0.5 + flutter));
+      g.beginPath(); g.ellipse(dir * s.w * 1.8, 0, s.w * 2.2, s.w * 0.45, 0, 0, 7); g.fill(); g.restore();
+    }
+  }
+  function wrapText(text, x, y, maxW, lh) {
+    const lines = []; let line = '';
+    for (const ch of text) { if (g.measureText(line + ch).width > maxW && line) { lines.push(line); line = ch; } else line += ch; }
+    if (line) lines.push(line);
+    lines.forEach((l, i) => g.fillText(l, x, y + (i - (lines.length - 1) / 2) * lh));
+  }
+
+  // ---------- 이벤트 ----------
+  $('#enter').onclick = () => { initAudio(); $('#intro').classList.add('hidden'); $('#msg').focus(); if (voice.mode === 'none') setTimeout(openVoice, 400); };
+  $('#chat').onsubmit = (e) => { e.preventDefault(); const v = $('#msg').value; $('#msg').value = ''; shoutText(v); };
+  $('#shout').onclick = toggleShout;
+  $('#blowAway').onclick = () => {
+    words.forEach((w) => { w.vy = -3; w.a *= 0.9; w.main = false; });
+    if (window.speechSynthesis) speechSynthesis.cancel();
+    buried = 0; $('#countText').textContent = '묻은 말 0개';
+    toast('🍃 바람이 다 날려보냈어요');
+  };
+  $('#openVoice').onclick = openVoice;
+  $('#voiceRec').onclick = toggleVoiceRec;
+  $('#voicePlay').onclick = playPreview;
+  $('#voiceClose').onclick = () => { if (voiceRec) toggleVoiceRec(); $('#voiceModal').classList.add('hidden'); };
+  $('#voiceDelete').onclick = () => {
+    store.del(K.sample); store.del(K.pitch); store.del(K.elVoice);
+    voice.sampleBlob = null; voice.f0 = null; previewBlob = null;
+    $('#voicePlay').disabled = true; $('#voiceStatus').textContent = '목소리를 삭제했어요'; updateEngine();
+  };
+  $('#openSettings').onclick = () => { $('#elKey').value = voice.elKey; $('#settingsStatus').textContent = ''; $('#settingsModal').classList.remove('hidden'); };
+  $('#settingsClose').onclick = () => $('#settingsModal').classList.add('hidden');
+  $('#elSave').onclick = () => {
+    const k = $('#elKey').value.trim();
+    if (!k) { $('#settingsStatus').textContent = '키를 입력해주세요'; return; }
+    store.set(K.elKey, k); store.del(K.elVoice); updateEngine();
+    $('#settingsStatus').textContent = voice.sampleBlob ? '✅ 저장했어요. 이제 글을 쓰면 진짜 내 목소리로 나와요.' : '✅ 저장했어요. 🎙 내 목소리를 먼저 등록해주세요.';
+  };
+  $('#elClear').onclick = () => { store.del(K.elKey); store.del(K.elVoice); $('#elKey').value = ''; updateEngine(); $('#settingsStatus').textContent = '키를 지웠어요'; };
+  if ('speechSynthesis' in window) speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
+
+  window.addEventListener('resize', resize);
+  resize(); loadSample(); requestAnimationFrame(draw);
+})();
+</script>
+</body>
+</html>
