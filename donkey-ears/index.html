@@ -59,7 +59,7 @@
   #quick::-webkit-scrollbar { display: none; }
   #quick .chip { flex: none; }
   #hint { text-align: center; font-size: 12px; color: var(--ink-dim); margin: 8px 0 0; }
-  #count { position: fixed; right: 16px; top: calc(64px + env(safe-area-inset-top)); z-index: 4;
+  #count { position: fixed; right: 16px; top: calc(100px + env(safe-area-inset-top)); z-index: 4;
     font-size: 12px; color: var(--ink-dim); display: flex; gap: 6px; align-items: center; }
 
   /* 모달 */
@@ -118,7 +118,7 @@
     <input id="msg" maxlength="200" placeholder="아무도 안 들어요. 속 시원하게 외쳐보세요">
     <button id="send" type="submit">외치기</button>
   </form>
-  <p id="hint">글을 쓰면 내 목소리로, 📣를 누르면 내 육성 그대로 숲에 메아리쳐요</p>
+  <p id="hint">📣를 누르면 내 육성 그대로, 글은 AI 음성으로 숲에 메아리쳐요</p>
 </div>
 
 <!-- 인트로 -->
@@ -137,12 +137,13 @@
 <div class="overlay hidden" id="voiceModal">
   <div class="card">
     <h2>🎙 내 목소리 등록</h2>
-    <p>아래 문장을 평소 목소리로 읽어주세요. 10초 이상이면 좋아요.</p>
+    <p>아래 문장을 평소 목소리로 읽어주세요. 10초 이상이면 좋아요. 중간에 틀리면 <b style="color:var(--ink)">✕ 취소</b> 후 다시 녹음하면 돼요.</p>
     <div class="script">옛날 옛적, 임금님의 귀가 당나귀 귀라는 걸 아는 사람이 있었어요. 너무 말하고 싶어서 참다 참다 대나무숲에 들어가 있는 힘껏 외쳤답니다. 임금님 귀는 당나귀 귀! 속이 다 시원하네!</div>
     <div class="meter"><i id="voiceMeter"></i></div>
     <div class="status" id="voiceStatus"></div>
     <div class="row">
       <button class="btn primary" id="voiceRec">● 녹음 시작</button>
+      <button class="btn hidden" id="voiceCancel">✕ 취소</button>
       <button class="btn" id="voicePlay" disabled>▶ 들어보기</button>
     </div>
     <div class="row">
@@ -158,6 +159,7 @@
     <h2>⚙ 진짜 내 목소리로 말하기</h2>
     <p>기본 모드는 휴대폰/PC에 내장된 한국어 음성을 <b style="color:var(--ink)">내 음높이에 맞춰</b> 바꾸는 방식이라 "비슷한 톤"까지만 돼요.</p>
     <p>ElevenLabs API 키를 넣으면 등록한 샘플로 <b style="color:var(--ink)">목소리를 복제</b>해서, 쓴 글을 진짜 내 목소리로 읽어줘요.</p>
+    <p class="small">💳 목소리 복제는 ElevenLabs 유료 플랜(Starter 이상)에서 돼요. 샘플은 30초~1분 정도로 녹음할수록 더 닮아요.</p>
     <p class="small">⚠ 이 모드에선 목소리 샘플과 입력한 글이 ElevenLabs로 전송돼요. 키는 이 기기 브라우저에만 저장돼요.</p>
     <label class="field">ElevenLabs API 키
       <input id="elKey" type="password" placeholder="sk_..." autocomplete="off">
@@ -167,7 +169,10 @@
       <button class="btn danger" id="elClear">키 지우기</button>
       <button class="btn primary" id="elSave">저장</button>
     </div>
-    <div class="row"><button class="btn" id="settingsClose">닫기</button></div>
+    <div class="row">
+      <button class="btn" id="elTest">🔊 내 목소리 테스트</button>
+      <button class="btn" id="settingsClose">닫기</button>
+    </div>
   </div>
 </div>
 
@@ -194,7 +199,7 @@
   }
 
   // ---------- 오디오 그래프: 대나무숲 메아리 ----------
-  let ctx, master, outAnalyser, echoIn;
+  let ctx, master, outAnalyser;
   function makeImpulse(seconds, decay) {
     const len = Math.floor(ctx.sampleRate * seconds);
     const buf = ctx.createBuffer(2, len, ctx.sampleRate);
@@ -211,26 +216,50 @@
     outAnalyser = ctx.createAnalyser(); outAnalyser.fftSize = 1024;
     master.connect(outAnalyser); outAnalyser.connect(ctx.destination);
 
-    echoIn = ctx.createGain();
-    // 원음
+    impulse = makeImpulse(3.4, 2.6);
+  }
+  let impulse;
+
+  // 재생 하나 = 전용 출력 하나. 새 소리를 내기 전에 이전 소리(메아리 꼬리까지)를 끊는다.
+  let current = null, playToken = 0, ttsSpeaking = false;
+  function stopPlayback() {
+    playToken++;
+    if ('speechSynthesis' in window) speechSynthesis.cancel();
+    ttsSpeaking = false;
+    if (!current) return;
+    const { sources, out } = current; current = null;
+    sources.forEach((src) => { try { src.stop(); } catch {} });
+    try {
+      out.gain.setTargetAtTime(0, ctx.currentTime, 0.03);
+      setTimeout(() => { try { out.disconnect(); } catch {} }, 200);
+    } catch {}
+  }
+  function newOutput() {
+    const out = ctx.createGain(); out.connect(master);
+    current = { sources: [], out };
+    return current;
+  }
+  // 대나무숲 메아리 체인: 원음 + 딜레이 반복(점점 먹먹하게) + 숲 잔향
+  function makeEchoChain(out) {
+    const input = ctx.createGain();
     const dry = ctx.createGain(); dry.gain.value = 0.85;
-    echoIn.connect(dry); dry.connect(master);
-    // 반복 메아리 (딜레이 + 피드백, 점점 먹먹해지도록 로우패스)
+    input.connect(dry); dry.connect(out);
     const delay = ctx.createDelay(2); delay.delayTime.value = 0.45;
     const fb = ctx.createGain(); fb.gain.value = 0.48;
     const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 2000;
     const wet = ctx.createGain(); wet.gain.value = 0.75;
-    echoIn.connect(delay); delay.connect(lp); lp.connect(fb); fb.connect(delay);
-    lp.connect(wet); wet.connect(master);
-    // 숲의 잔향
-    const conv = ctx.createConvolver(); conv.buffer = makeImpulse(3.4, 2.6);
+    input.connect(delay); delay.connect(lp); lp.connect(fb); fb.connect(delay);
+    lp.connect(wet); wet.connect(out);
+    const conv = ctx.createConvolver(); conv.buffer = impulse;
     const rv = ctx.createGain(); rv.gain.value = 0.4;
-    echoIn.connect(conv); conv.connect(rv); rv.connect(master);
+    input.connect(conv); conv.connect(rv); rv.connect(out);
+    return input;
   }
 
   // 오디오 버퍼를 메아리로: 원음 → 왼쪽 대나무가 속삭임 → 오른쪽 대나무가 더 작게 속삭임
   function playEcho(buffer) {
-    initAudio();
+    initAudio(); stopPlayback();
+    const pb = newOutput(), echoIn = makeEchoChain(pb.out);
     const t0 = ctx.currentTime + 0.05;
     const plan = [ { g: 1, pan: 0, rate: 1 }, { g: 0.4, pan: -0.7, rate: 0.97 }, { g: 0.16, pan: 0.7, rate: 0.94 } ];
     let t = t0;
@@ -240,7 +269,7 @@
       const pan = ctx.createStereoPanner ? ctx.createStereoPanner() : null;
       src.connect(g);
       if (pan) { pan.pan.value = p.pan; g.connect(pan); pan.connect(echoIn); } else g.connect(echoIn);
-      src.start(t);
+      src.start(t); pb.sources.push(src);
       t += buffer.duration / p.rate + 0.5;
     });
     return (t - ctx.currentTime) + 2.5; // 대략 끝나는 시간(초)
@@ -329,27 +358,27 @@
   }
   function updateEngine() {
     const el = $('#engine');
-    if (voice.mode === 'clone') el.textContent = '🟢 진짜 내 목소리 (복제)';
-    else if (voice.mode === 'pitch') el.textContent = `🟡 내 톤 흉내 · ${voice.f0 ? voice.f0 + 'Hz' : '기본 톤'}`;
-    else el.textContent = '⚪ 목소리 미등록 · 기본 음성';
+    if (voice.mode === 'clone') el.textContent = '🟢 글도 진짜 내 목소리 (복제)';
+    else if (voice.mode === 'pitch') el.textContent = '🟡 글: AI 음성(내 톤 흉내) · 📣: 내 육성';
+    else el.textContent = '⚪ 글: AI 음성 · 📣: 내 육성 (목소리 미등록)';
   }
 
   // 기기 내장 TTS: 음높이를 내 목소리에 맞추고, 대나무가 점점 작게 따라 속삭이게
-  let ttsSpeaking = false;
   function ttsEcho(text) {
     if (!('speechSynthesis' in window)) { toast('이 브라우저는 음성 합성을 지원하지 않아요'); return 0; }
     const synth = window.speechSynthesis;
     const ko = synth.getVoices().filter((v) => /^ko/i.test(v.lang));
     // 기본 한국어 음성은 대개 200Hz 안팎. 내 F0에 비례해 pitch(0~2) 조절
     const pitch = voice.f0 ? Math.max(0.3, Math.min(1.7, voice.f0 / 200)) : 1;
-    synth.cancel();
+    stopPlayback();
+    const token = playToken;
     const reps = [ { vol: 1, rate: 1 }, { vol: 0.45, rate: 0.9 }, { vol: 0.18, rate: 0.82 } ];
     reps.forEach((r, i) => {
       const u = new SpeechSynthesisUtterance(text);
       u.lang = 'ko-KR'; if (ko[0]) u.voice = ko[0];
       u.pitch = pitch; u.volume = r.vol; u.rate = r.rate;
-      if (i === 0) u.onstart = () => { ttsSpeaking = true; };
-      if (i === reps.length - 1) u.onend = u.onerror = () => { ttsSpeaking = false; };
+      if (i === 0) u.onstart = () => { if (token === playToken) ttsSpeaking = true; };
+      if (i === reps.length - 1) u.onend = u.onerror = () => { if (token === playToken) ttsSpeaking = false; };
       synth.speak(u);
     });
     return text.length * 0.18 * 3 + 2;
@@ -381,23 +410,35 @@
   }
 
   // ---------- 채팅 → 메아리 ----------
-  let buried = 0;
+  let buried = 0, textReq = 0;
   async function shoutText(text) {
     text = text.trim(); if (!text) return;
     initAudio();
     spawnWords(text);
     buried++; $('#countText').textContent = `묻은 말 ${buried}개`;
     if (voice.mode === 'clone') {
-      try { const buf = await elSpeak(text); scheduleWhispers(text, playEcho(buf)); return; }
-      catch (e) { toast(e.message + ' → 기본 음성으로 대신할게요', 4000); }
+      stopPlayback();
+      const token = ++textReq;
+      try { const buf = await elSpeak(text); if (token === textReq) scheduleWhispers(text, playEcho(buf)); return; }
+      catch (e) { if (token !== textReq) return; toast(e.message + ' → AI 음성으로 대신할게요', 4000); }
     }
-    if (voice.mode === 'none' && !shoutText.nudged) { shoutText.nudged = true; toast('🎙 내 목소리를 등록하면 내 톤으로 메아리쳐요'); }
+    if (!shoutText.nudged) {
+      shoutText.nudged = true;
+      toast(voice.mode === 'none'
+        ? '지금은 AI 음성이에요. 📣를 누르면 내 육성 그대로 메아리쳐요'
+        : '글은 AI 음성이 내 톤을 흉내내요. 진짜 내 목소리는 📣 또는 ⚙ 목소리 복제', 4500);
+    }
     scheduleWhispers(text, ttsEcho(text));
   }
 
   // ---------- 📣 육성 외치기 ----------
-  let shoutRec = null, recog = null, recogText = '';
+  let shoutRec = null, recog = null, recogText = '', shoutBusy = false;
   async function toggleShout() {
+    if (shoutBusy) return;
+    shoutBusy = true;
+    try { await toggleShoutInner(); } finally { shoutBusy = false; }
+  }
+  async function toggleShoutInner() {
     const btn = $('#shout');
     if (shoutRec) {
       const rec = shoutRec; shoutRec = null; btn.classList.remove('rec'); btn.textContent = '📣';
@@ -415,7 +456,7 @@
     }
     try {
       const stream = await getMic();
-      if (window.speechSynthesis) speechSynthesis.cancel();
+      stopPlayback();
       shoutRec = startRecording(stream);
       btn.classList.add('rec'); btn.textContent = '■';
       toast('외치세요! 다 외쳤으면 ■ 를 눌러요');
@@ -427,28 +468,54 @@
         recog.onerror = () => {};
         try { recog.start(); } catch {}
       }
-      setTimeout(() => { if (shoutRec) toggleShout(); }, 30000); // 최대 30초
+      const mine = shoutRec;
+      setTimeout(() => { if (shoutRec === mine) toggleShout(); }, 30000); // 최대 30초
     } catch (e) { toast('마이크를 쓸 수 없어요: ' + (e.message || e.name)); }
   }
 
   // ---------- 목소리 등록 모달 ----------
-  let voiceRec = null, voiceTimer = null, previewBlob = null;
+  // 상태: idle(대기) → recording(녹음 중) → processing(분석 중) → idle
+  let vState = 'idle', voiceRec = null, voiceTimer = null, previewBlob = null;
+  const VMIN = 4, VMAX = 60;
+  function renderVoiceUI(msg) {
+    const rec = vState === 'recording', busy = vState === 'processing';
+    $('#voiceRec').textContent = rec ? '■ 녹음 완료' : (voice.sampleBlob ? '● 다시 녹음' : '● 녹음 시작');
+    $('#voiceRec').disabled = busy;
+    $('#voiceCancel').classList.toggle('hidden', !rec);
+    $('#voicePlay').classList.toggle('hidden', rec);
+    $('#voicePlay').disabled = busy || !previewBlob;
+    $('#voiceDelete').disabled = rec || busy || !voice.sampleBlob;
+    if (!rec) $('#voiceMeter').style.width = '0';
+    if (msg !== undefined) $('#voiceStatus').textContent = msg;
+  }
   function openVoice() {
     $('#voiceModal').classList.remove('hidden');
     previewBlob = voice.sampleBlob;
-    $('#voicePlay').disabled = !previewBlob;
-    $('#voiceStatus').textContent = voice.sampleBlob ? `등록됨 · 내 음높이 약 ${voice.f0 || '?'}Hz` : '아직 등록된 목소리가 없어요';
+    renderVoiceUI(voice.sampleBlob ? `등록됨 · 내 음높이 약 ${voice.f0 || '?'}Hz` : '아직 등록된 목소리가 없어요');
+  }
+  function endVoiceRecording() {
+    clearInterval(voiceTimer); voiceTimer = null;
+    const rec = voiceRec; voiceRec = null;
+    return rec;
+  }
+  // 녹음 중 취소: 녹음분은 버리고, 기존에 등록된 목소리는 그대로
+  async function cancelVoiceRec(msg = '취소했어요. 준비되면 다시 녹음하세요.') {
+    if (vState !== 'recording') return;
+    const rec = endVoiceRecording();
+    vState = 'idle';
+    renderVoiceUI(msg);
+    if (rec) { try { await rec.stop(); } catch {} }
+    releaseMic();
   }
   async function toggleVoiceRec() {
-    const btn = $('#voiceRec');
-    if (voiceRec) {
-      const secs = voiceRec.elapsed();
-      clearInterval(voiceTimer);
-      const blob = await voiceRec.stop(); voiceRec = null; releaseMic();
-      btn.textContent = '● 다시 녹음';
-      $('#voiceMeter').style.width = '0';
-      if (secs < 4) { $('#voiceStatus').textContent = '너무 짧아요. 문장을 끝까지 읽어주세요.'; return; }
-      $('#voiceStatus').textContent = '분석 중…';
+    if (vState === 'processing') return;
+    if (vState === 'recording') {
+      const rec = endVoiceRecording();
+      const secs = rec.elapsed();
+      vState = 'processing'; renderVoiceUI('분석 중…');
+      let blob;
+      try { blob = await rec.stop(); } finally { releaseMic(); }
+      if (secs < VMIN) { vState = 'idle'; renderVoiceUI('너무 짧아요. 문장을 끝까지 읽어주세요.'); return; }
       try {
         const buf = await blobToBuffer(blob);
         const f0 = estimatePitch(buf);
@@ -456,28 +523,46 @@
         store.set(K.pitch, f0 || '');
         store.del(K.elVoice); // 새 샘플이면 복제 다시
         const saved = store.set(K.sample, await blobToDataURL(blob));
-        $('#voicePlay').disabled = false;
-        $('#voiceStatus').textContent = `✅ 등록 완료 · 내 음높이 약 ${f0 || '?'}Hz` + (saved ? '' : ' (이 브라우저에선 저장이 안 돼서 이번만 쓸 수 있어요)');
+        vState = 'idle';
+        renderVoiceUI(`✅ 등록 완료 · 내 음높이 약 ${f0 || '?'}Hz` + (saved ? '' : ' (이 브라우저에선 저장이 안 돼서 이번만 쓸 수 있어요)'));
         updateEngine();
-      } catch { $('#voiceStatus').textContent = '녹음을 분석하지 못했어요. 다시 해주세요.'; }
+      } catch { vState = 'idle'; renderVoiceUI('녹음을 분석하지 못했어요. 다시 해주세요.'); }
       return;
     }
+    // idle → recording
+    vState = 'processing'; renderVoiceUI('마이크 켜는 중…');
     try {
+      stopPlayback();
       const stream = await getMic();
+      if ($('#voiceModal').classList.contains('hidden')) { vState = 'idle'; releaseMic(); return; } // 그새 닫았으면
       voiceRec = startRecording(stream);
-      btn.textContent = '■ 녹음 끝내기';
+      vState = 'recording'; renderVoiceUI('녹음 중… 0.0초');
       voiceTimer = setInterval(() => {
-        const s = voiceRec ? voiceRec.elapsed() : 0;
-        $('#voiceStatus').textContent = `녹음 중… ${s.toFixed(1)}초`;
+        if (!voiceRec) return;
+        const sec = voiceRec.elapsed();
+        $('#voiceStatus').textContent = `녹음 중… ${sec.toFixed(1)}초` + (sec < VMIN ? '' : ' · 다 읽었으면 ■ 녹음 완료');
         $('#voiceMeter').style.width = Math.round(levelOf(micAnalyser) * 100) + '%';
-        if (s >= 30) toggleVoiceRec();
-      }, 80);
-    } catch (e) { $('#voiceStatus').textContent = '마이크를 쓸 수 없어요: ' + (e.message || e.name); }
+        if (sec >= VMAX) toggleVoiceRec();
+      }, 100);
+    } catch (e) { vState = 'idle'; releaseMic(); renderVoiceUI('마이크를 쓸 수 없어요: ' + (e.message || e.name)); }
   }
+  // ▶ 들어보기: 다시 누르면 멈춤 (두 번 겹쳐 나오지 않게)
+  let previewing = false;
   async function playPreview() {
+    if (previewing) { stopPlayback(); return; }
     if (!previewBlob) return;
-    try { const buf = await blobToBuffer(previewBlob); initAudio();
-      const s = ctx.createBufferSource(); s.buffer = buf; s.connect(master); s.start(); } catch {}
+    try {
+      const buf = await blobToBuffer(previewBlob);
+      stopPlayback();
+      const pb = newOutput(), token = playToken;
+      const s = ctx.createBufferSource(); s.buffer = buf; s.connect(pb.out); pb.sources.push(s);
+      previewing = true; $('#voicePlay').textContent = '■ 멈추기';
+      const done = () => { previewing = false; $('#voicePlay').textContent = '▶ 들어보기'; };
+      s.onended = done;
+      const watch = setInterval(() => { if (token !== playToken) { clearInterval(watch); done(); } }, 100);
+      s.addEventListener('ended', () => clearInterval(watch));
+      s.start();
+    } catch { toast('녹음을 재생하지 못했어요'); }
   }
 
   // ---------- 화면: 밤의 대나무숲 ----------
@@ -620,18 +705,23 @@
   document.querySelectorAll('#quick .chip').forEach((b) => { b.onclick = () => shoutText(b.textContent); });
   $('#blowAway').onclick = () => {
     words.forEach((w) => { w.vy = -3; w.a *= 0.9; w.main = false; });
-    if (window.speechSynthesis) speechSynthesis.cancel();
+    stopPlayback();
     buried = 0; $('#countText').textContent = '묻은 말 0개';
     toast('🍃 바람이 다 날려보냈어요');
   };
   $('#openVoice').onclick = openVoice;
   $('#voiceRec').onclick = toggleVoiceRec;
+  $('#voiceCancel').onclick = () => cancelVoiceRec();
   $('#voicePlay').onclick = playPreview;
-  $('#voiceClose').onclick = () => { if (voiceRec) toggleVoiceRec(); $('#voiceModal').classList.add('hidden'); };
+  $('#voiceClose').onclick = () => {
+    cancelVoiceRec(); // 닫으면 녹음 중이던 건 버림
+    if (previewing) stopPlayback();
+    $('#voiceModal').classList.add('hidden');
+  };
   $('#voiceDelete').onclick = () => {
     store.del(K.sample); store.del(K.pitch); store.del(K.elVoice);
     voice.sampleBlob = null; voice.f0 = null; previewBlob = null;
-    $('#voicePlay').disabled = true; $('#voiceStatus').textContent = '목소리를 삭제했어요'; updateEngine();
+    renderVoiceUI('목소리를 삭제했어요'); updateEngine();
   };
   $('#openSettings').onclick = () => { $('#elKey').value = voice.elKey; $('#settingsStatus').textContent = ''; $('#settingsModal').classList.remove('hidden'); };
   $('#settingsClose').onclick = () => $('#settingsModal').classList.add('hidden');
@@ -640,6 +730,19 @@
     if (!k) { $('#settingsStatus').textContent = '키를 입력해주세요'; return; }
     store.set(K.elKey, k); store.del(K.elVoice); updateEngine();
     $('#settingsStatus').textContent = voice.sampleBlob ? '✅ 저장했어요. 이제 글을 쓰면 진짜 내 목소리로 나와요.' : '✅ 저장했어요. 🎙 내 목소리를 먼저 등록해주세요.';
+  };
+  $('#elTest').onclick = async () => {
+    const st = $('#settingsStatus');
+    if (!voice.elKey) { st.textContent = '먼저 키를 저장해주세요'; return; }
+    if (!voice.sampleBlob) { st.textContent = '🎙 내 목소리를 먼저 등록해주세요'; return; }
+    $('#elTest').disabled = true; st.textContent = '목소리 복제·합성 중… (처음엔 10초쯤 걸려요)';
+    try {
+      initAudio();
+      const buf = await elSpeak('안녕하세요. 대나무숲에 오신 걸 환영해요. 임금님 귀는 당나귀 귀!');
+      playEcho(buf); st.textContent = '✅ 성공! 이제 글을 쓰면 이 목소리로 나와요.';
+    } catch (e) {
+      st.textContent = '❌ ' + (e.message || e) + (e instanceof TypeError ? ' (네트워크/브라우저 차단일 수 있어요)' : '');
+    } finally { $('#elTest').disabled = false; }
   };
   $('#elClear').onclick = () => { store.del(K.elKey); store.del(K.elVoice); $('#elKey').value = ''; updateEngine(); $('#settingsStatus').textContent = '키를 지웠어요'; };
   if ('speechSynthesis' in window) speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
