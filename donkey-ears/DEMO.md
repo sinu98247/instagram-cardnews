@@ -1,7 +1,7 @@
 # 🫏 임금님 귀는 당나귀 귀 — 프로토타입 시연 가이드
 
 ## 시연 링크
-**https://rawcdn.githack.com/sinu98247/instagram-cardnews/777ae732147b0fa24646373ff0d480c01c2fe462/donkey-ears/index.html**
+**https://rawcdn.githack.com/sinu98247/instagram-cardnews/90dfecb65b921fd908409d94410b5beb1de572d6/donkey-ears/index.html**
 
 휴대폰 카메라로 찍으면 바로 열려요 ↓
 
