@@ -1,0 +1,21 @@
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@latest"]
+    },
+    "figma": {
+      "command": "npx",
+      "args": ["-y", "figma-developer-mcp", "--stdio"],
+      "env": { "FIGMA_API_KEY": "${FIGMA_API_KEY:-}" }
+    },
+    "blender": {
+      "command": "uvx",
+      "args": ["mcp-for-blender"]
+    },
+    "unity": {
+      "type": "http",
+      "url": "http://localhost:8080/mcp"
+    }
+  }
+}

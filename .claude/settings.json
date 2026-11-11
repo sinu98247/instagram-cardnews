@@ -1,0 +1,18 @@
+{
+  "extraKnownMarketplaces": {
+    "anthropic-agent-skills": { "source": { "source": "github", "repo": "anthropics/skills" } },
+    "gsap-skills": { "source": { "source": "github", "repo": "greensock/gsap-skills" } },
+    "hyperframes": { "source": { "source": "github", "repo": "heygen-com/hyperframes" } },
+    "impeccable": { "source": { "source": "github", "repo": "pbakaus/impeccable" } },
+    "ui-ux-pro-max-skill": { "source": { "source": "github", "repo": "nextlevelbuilder/ui-ux-pro-max-skill" } },
+    "superpowers-marketplace": { "source": { "source": "github", "repo": "obra/superpowers-marketplace" } }
+  },
+  "enabledPlugins": {
+    "example-skills@anthropic-agent-skills": true,
+    "gsap-skills@gsap-skills": true,
+    "hyperframes@hyperframes": true,
+    "impeccable@impeccable": true,
+    "ui-ux-pro-max@ui-ux-pro-max-skill": true,
+    "superpowers@superpowers-marketplace": true
+  }
+}

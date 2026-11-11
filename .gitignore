@@ -3,3 +3,8 @@ __pycache__/
 .env
 .venv/
 output/_tmp/
+
+# studio/setup.sh 가 받아오는 외부 스킬 (커밋하지 않고 스크립트로 갱신)
+.claude/skills/motion-design/
+.claude/skills/remotion-*/
+.claude/settings.local.json
