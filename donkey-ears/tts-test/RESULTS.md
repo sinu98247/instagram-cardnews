@@ -30,3 +30,10 @@ ElevenLabs 없이 공개 모델로 "타이핑 → 내 목소리"가 되는지 �
 ## 재현
 `synth.py`(합성), `evalsv.py`(측정). 모델은 Hugging Face `myshell-ai/OpenVoiceV2`, `myshell-ai/MeloTTS-Korean`,
 코드는 GitHub `myshell-ai/OpenVoice`, `myshell-ai/MeloTTS`.
+
+## 직접 들어본 평가와 프로젝트 상태 (2026-11-11)
+- 직접 들어본 결과: **감정이 실리지 않음.** 욕을 해도 또박또박 읽는 말투라 속풀이 느낌이 나지 않음.
+- 결정: **프로젝트 당분간 중단.**
+- 재개 조건: 감정(화, 짜증)을 실어 말하는 목소리 복제가 가능해질 때.
+- 재개 시 먼저 볼 것: 억양·감정까지 따라 하는 방식의 모델(CosyVoice 2, GPT-SoVITS, IndexTTS-2 등)과
+  ElevenLabs의 감정 표현 기능. 같은 문장·같은 화자로 `synth.py`/`evalsv.py`와 비교.
