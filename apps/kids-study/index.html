@@ -180,6 +180,34 @@ body.printmode{background:#fff;padding:0}
 body.printmode > *:not(#printRoot){display:none!important}
 body.printmode #printRoot{display:block}
 body.printmode .sheet{border:0;border-radius:0;max-width:none;width:210mm;height:297mm;overflow:hidden;page-break-after:always;padding:12mm}
+/* 2학년 추가 */
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:420px;width:100%;margin:0 auto}
+.pad button{min-height:68px;font-size:1.8rem}
+.pad .padok{background:var(--sun);border-color:var(--sun);color:#2B2006}
+.pad .padx{font-size:1.1rem}
+.numdisp{grid-column:1/-1;font-family:var(--f-display);font-size:2.6rem;text-align:center;border:3px solid var(--line);border-radius:16px;padding:6px;background:var(--surface);min-height:72px}
+.numdisp.right{border-color:var(--good);background:var(--sci-soft)}
+.numdisp.wrong{border-color:var(--bad);background:var(--kor-soft)}
+.choices.long{grid-template-columns:1fr}
+.choices button.txt{font-size:1.2rem;min-height:64px;font-family:var(--f-body);font-weight:700}
+.vert{display:inline-grid;grid-template-columns:auto auto;column-gap:.35em;font-family:var(--f-display);font-size:3rem;line-height:1.25;text-align:right;font-variant-numeric:tabular-nums}
+.vert .vl{border-top:4px solid currentColor}
+.passage{font-family:var(--f-body);font-size:1.15rem;line-height:1.8;text-align:left;background:var(--sun-soft);padding:14px 16px;border-radius:14px;max-width:560px}
+.grp{border:2px dashed var(--line);border-radius:12px;padding:2px 6px;font-size:.55em}
+.tbl{border-collapse:collapse;font-size:1.1rem;font-family:var(--f-body)}
+.tbl th,.tbl td{border:2px solid var(--line);padding:4px 14px}
+.vis.svgr svg{width:min(440px,100%);height:auto}
+.rbar{fill:var(--sun)} .rbody{fill:var(--sun-soft);stroke:var(--ink);stroke-width:1.5} .rtick{stroke:var(--ink);stroke-width:1.2} .rnum{fill:var(--ink);font-family:var(--f-body)}
+.shape{fill:var(--math-soft);stroke:var(--math)}
+.sheet .vert{font-size:24px} .sheet .vert .vl{border-top-width:2px}
+.sheet .passage{font-size:11.5px;background:#f4f4f4;padding:6px 8px;line-height:1.6}
+.sheet .grp{font-size:13px;border-color:#999}
+.sheet .tbl{font-size:12px} .sheet .tbl th,.sheet .tbl td{border:1px solid #888;padding:1px 8px}
+.sheet .vis.svgr svg{width:240px}
+.sheet .rbar{fill:#bbb} .sheet .rbody{fill:#fff;stroke:#111} .sheet .rtick{stroke:#111} .sheet .rnum{fill:#111}
+.sheet .shape{fill:#fff;stroke:#111}
+.sheet .wq .wv .big{font-size:26px!important}.sheet .wq .wv .formula{font-size:22px!important}.sheet .wq .wv .say{font-size:16px!important}.sheet .wq .wv .emo-row{font-size:22px!important}.sheet .wq .wv .grp{font-size:13px!important}
+
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
@@ -187,7 +215,7 @@ body.printmode .sheet{border:0;border-radius:0;max-width:none;width:210mm;height
   <!-- HOME -->
   <section id="v-home" class="stack" style="gap:18px">
     <div class="top">
-      <span class="brand"><i></i>한걸음 공부방</span>
+      <span class="brand"><i></i>한걸음 공부방 <span class="tag" id="gradeTag" style="background:var(--sun-soft);font-size:.9rem">2학년</span></span>
       <button class="quiet" id="toParent">부모님</button>
     </div>
     <div class="card today">
@@ -195,7 +223,7 @@ body.printmode .sheet{border:0;border-radius:0;max-width:none;width:210mm;height
         <h1 id="hello">오늘도 한 걸음!</h1>
         <span class="tag" style="background:var(--sun-soft)" id="streakTag">연속 0일</span>
       </div>
-      <p class="muted" id="todayHint">네 과목을 조금씩, 15분이면 끝나요.</p>
+      <p class="muted" id="todayHint">네 과목을 조금씩, 20분이면 끝나요.</p>
       <div class="steps" id="todaySteps"></div>
       <button class="go" id="startDaily">오늘의 공부 시작</button>
     </div>
@@ -301,28 +329,36 @@ body.printmode .sheet{border:0;border-radius:0;max-width:none;width:210mm;height
 
       <div id="p-plan" class="stack why" hidden>
         <div class="card">
-          <h3>하루 루틴 (약 15분)</h3>
-          <p>국어 → 몸 깨우기 → 수학 → 몸 깨우기 → 영어 → 몸 깨우기 → 과학. 과목당 5문제, 3~4분입니다. 7살의 집중 시간은 보통 10~15분이라, 짧게 끊고 몸을 움직이게 했습니다.</p>
-          <p>권장: 평일 매일 태블릿 15분 + 주말에 학습지 1~2장. 학습지는 태블릿에서 틀린 단계를 골라 뽑으면 좋습니다.</p>
+          <h3>하루 루틴 (2학년 약 20분, 1학년 약 15분)</h3>
+          <p>국어 → 몸 깨우기 → 수학 → 몸 깨우기 → 영어 → 몸 깨우기 → 과학. 과목당 5문제입니다. 2학년 수학은 보기를 고르지 않고 숫자 패드로 직접 답을 입력합니다. 고르는 것보다 스스로 떠올리는 것이 더 강한 연습이기 때문입니다.</p>
+          <p>권장: 평일 매일 태블릿 20분 + 주말에 학습지 1~2장. 학습 현황에서 정답률이 낮은 단계를 골라 학습지로 뽑으세요.</p>
         </div>
         <div class="card stack">
-          <h3>연구에서 가져온 다섯 가지 원리</h3>
-          <p><b>떠올리기 연습.</b> 읽기만 하는 것보다 스스로 답을 떠올릴 때 더 오래 기억합니다. 모든 활동은 고르거나 떠올리는 문제입니다. (Roediger & Karpicke, 2006)</p>
-          <p><b>간격 복습.</b> 틀린 문제를 1일, 3일 간격으로 다시 보여줍니다. 몰아서 하는 것보다 나눠서 할 때 장기 기억이 좋아집니다. (Cepeda 외, 2006 메타분석)</p>
-          <p><b>완전 학습.</b> 한 단계에서 80% 이상을 두 번 맞혀야 다음 단계가 열립니다. 기초를 다진 뒤 넘어가면 뒤처지는 아이가 줄어듭니다. (Bloom, 1984; Kulik 외, 1990)</p>
-          <p><b>한 번 더 기회.</b> 틀리면 바로 답을 보여주지 않고 한 번 더 생각하게 합니다. 그래도 틀리면 정답을 보여줍니다. 기록은 첫 시도로 남깁니다.</p>
-          <p><b>움직임 휴식.</b> 과목 사이 15초 신체 활동. 짧은 운동은 아이들의 주의 집중과 실행 기능을 돕습니다. (Chang 외, 2012)</p>
-          <p><b>소리로 읽어주기.</b> 1학년은 읽기가 아직 서툴러서 모든 문제를 소리로 읽어줍니다. 영어는 원어 발음으로 들려줍니다. (기기에 한국어·영어 음성이 있어야 합니다)</p>
+          <h3>교육과정 기준</h3>
+          <p>현재 초등학교 전 학년에 적용되는 <b>2022 개정 교육과정</b>을 따랐습니다.</p>
+          <p><b>국어</b> 1~2학년군 영역(듣기·말하기, 읽기, 쓰기, 문법, 문학, 매체) 가운데 한글 해득, 소리와 표기가 다른 낱말, 문장 부호, 흉내 내는 말, 높임 표현, 글의 내용 확인을 다룹니다.</p>
+          <p><b>수학</b> 네 영역(수와 연산, 변화와 관계, 도형과 측정, 자료와 가능성)에 맞췄습니다. 2학년은 세 자리 수, 받아올림·받아내림, 곱셈구구, 길이(cm·m), 시각과 시간, 규칙과 표, 여러 가지 도형입니다.</p>
+          <p><b>영어</b>는 3학년부터 정규 과목입니다. 그래서 2학년 과정은 3학년 수업을 미리 준비하도록 알파벳, 단모음 파닉스, 생활 낱말, 인사 표현, 짧은 문장으로 짰습니다.</p>
+          <p><b>과학</b>도 3학년부터 정규 과목입니다. 2학년 통합교과 주제(나, 자연, 마을, 세계)와 3학년 과학에서 처음 만나는 주제(동물의 한살이, 물체와 물질, 자석, 빛과 소리)를 함께 넣었습니다.</p>
+          <p class="small muted">학교마다 교과서 출판사와 진도가 다릅니다. 학교 진도에 맞춰 부모님이 학습 현황에서 단계를 직접 조정하세요.</p>
         </div>
         <div class="card stack">
-          <h3>과목별 단계</h3>
-          <div id="planLevels" class="small stack" style="gap:8px"></div>
-          <p class="small muted">2022 개정 교육과정 1학년 국어·수학을 따랐습니다. 영어는 3학년부터 정규 과목이라 알파벳과 파닉스 기초로, 과학은 1학년 통합교과(슬기로운 생활)의 관찰·분류 활동을 바탕으로 구성했습니다.</p>
+          <h3>연구에서 가져온 원리</h3>
+          <p><b>떠올리기 연습.</b> 읽기만 하는 것보다 스스로 답을 떠올릴 때 더 오래 기억합니다. (Roediger & Karpicke, 2006)</p>
+          <p><b>간격 복습.</b> 틀린 문제를 1일, 3일 간격으로 다시 보여줍니다. (Cepeda 외, 2006)</p>
+          <p><b>완전 학습.</b> 한 단계에서 80% 이상을 두 번 맞혀야 다음 단계가 열립니다. (Bloom, 1984)</p>
+          <p><b>한 번 더 기회.</b> 틀리면 한 번 더 생각하게 하고, 그래도 틀리면 정답을 보여줍니다. 기록은 첫 시도 기준입니다.</p>
+          <p><b>움직임 휴식.</b> 과목 사이 15초 신체 활동. (Chang 외, 2012)</p>
+        </div>
+        <div class="card stack">
+          <h3><span id="planGrade">2학년</span> 단계표</h3>
+          <div id="planLevels" class="small stack" style="gap:12px"></div>
         </div>
       </div>
 
       <div id="p-settings" class="stack" hidden>
         <div class="card">
+          <div class="set"><span>학년</span><select id="stGrade"><option value="1">1학년</option><option value="2">2학년</option></select></div>
           <div class="set"><span>아이 이름</span><input type="text" id="stName" placeholder="예: 민준" style="font:inherit;padding:8px 10px;border-radius:10px;border:2px solid var(--line);background:var(--bg);color:var(--ink);width:160px"></div>
           <div class="set"><span>과목당 문제 수</span><select id="stN"><option value="3">3문제</option><option value="5">5문제</option><option value="7">7문제</option></select></div>
           <div class="set"><span>문제 읽어주기</span><select id="stVoice"><option value="1">켜기</option><option value="0">끄기</option></select></div>
@@ -411,7 +447,7 @@ function clockSVG(h,m){let s='<svg viewBox="0 0 100 100"><circle class="clock-fa
   s+=`<line class="clock-min" x1="50" y1="50" x2="${50+33*Math.cos(ma)}" y2="${50+33*Math.sin(ma)}" stroke-width="3" stroke-linecap="round"/><circle class="clock-ink" cx="50" cy="50" r="3"/></svg>`;return s}
 
 /* Question: {key, vis, text, say, lang, choices[], ans, labels{}, big, reveal, sayAns} */
-const LEVELS={
+const LEVELS1={
 kor:[
  {name:'첫소리 찾기',desc:'그림 이름의 첫 자음을 찾아요',gen(){const pool=[...W0,...W1].filter(w=>BCHO.includes(choOf(w[0])));const [w,e]=pick(pool);const a=CHO[choOf(w)];
    return{key:w,vis:`<div>${e}</div>`,text:'첫소리는 무엇일까요?',say:`${w}. ${w}의 첫소리는 무엇일까요?`,choices:mc(a,BCHO.map(i=>CHO[i])),ans:a,big:true,reveal:`${w} → ${a}`}}},
@@ -482,15 +518,156 @@ sci:[
  {name:'식물의 한살이',desc:'뿌리, 줄기, 잎, 꽃, 열매',gen(){const [e,q,a,d]=pick(PLANT);
    return{key:'PL'+q,vis:`<div>${e}</div>`,text:q,say:q,choices:shuffle([a,...d]),ans:a}}},
 ]};
+/* ================= 2학년 (2022 개정 교육과정) ================= */
+const qaGen=(list,opt={})=>function(){const [e,q,a,w]=pick(list);return{key:q,vis:e?`<div>${e}</div>`:'',text:q,say:q.replace(/□/g,'무엇'),choices:shuffle([a,...w]),ans:a,...opt}};
+const sentGen=(list,text)=>function(){const [e,s,a,w]=pick(list);return{key:s,vis:`<div>${e}</div><div class="sent">${esc(s).replace('□','<span class="blank"></span>')}</div>`,text,say:s.replace('□','무엇')+' '+text,choices:shuffle([a,...w]),ans:a,sayAns:s.replace('□',a)}};
+const K2_LINK=[['머거요','먹어요','먹거요'],['노라요','놀아요','놀라요'],['차자요','찾아요','찻아요'],['우서요','웃어요','웃서요'],['이버요','입어요','입버요'],['어름','얼음','얼믐'],['다다요','닫아요','닿아요'],['가치','같이','갓이'],['해도지','해돋이','해돗이'],['궁물','국물','국믈'],['망내','막내','맏내'],['꼰닙','꽃잎','꽃닙'],['깨끄태요','깨끗해요','깨끋해요'],['부어케','부엌에','부억에'],['바께','밖에','박에'],['조아요','좋아요','조하요'],['만타','많다','만다'],['일거요','읽어요','익어요']];
+const K2_SPELL=[['🤒','감기가 다 □.','나았어요',['낳았어요']],['🐔','닭이 알을 □.','낳았어요',['나았어요']],['🪟','창문을 꼭 □.','닫았어요',['닿았어요']],['🙋','손이 천장에 □.','닿았어요',['닫았어요']],['💇','빗으로 머리를 □.','빗어요',['빚어요']],['🥟','추석에 송편을 □.','빚어요',['빗어요']],['🌬️','바람이 □ 불어요.','세게',['새게']],['🚰','수도에서 물이 □.','새요',['세요']],['🎒','어깨에 가방을 □.','메요',['매요']],['👟','신발 끈을 꽉 □.','매요',['메요']],['🖼️','그림을 벽에 □.','붙여요',['부쳐요']],['✉️','할머니께 편지를 □.','부쳐요',['붙여요']],['📏','자를 대고 선을 □ 그어요.','반듯이',['반드시']],['📚','숙제는 □ 해야 해요.','반드시',['반듯이']]];
+const K2_PUNCT=[['너는 몇 살이니□','?'],['와, 정말 멋지다□','!'],['나는 학교에 갑니다□','.'],['오늘 날씨가 어때□','?'],['우아, 눈이 온다□','!'],['동생과 공원에 갔어요□','.'],['이건 누구의 공책이니□','?'],['앗, 뜨거워□','!'],['내일은 소풍 가는 날입니다□','.'],['사과□ 배, 포도를 샀어요.',','],['민지야□ 같이 놀자.',',']];
+const PUNCT_L={'.':'마침표','?':'물음표','!':'느낌표',',':'쉼표'};
+const K2_MIMIC=[['🐰','토끼가 □ 뛰어요.','깡충깡충',['엉금엉금','뒤뚱뒤뚱']],['🐢','거북이가 □ 기어가요.','엉금엉금',['깡충깡충','훨훨']],['🦆','오리가 □ 걸어요.','뒤뚱뒤뚱',['훨훨','깡충깡충']],['🌧️','비가 □ 내려요.','주룩주룩',['반짝반짝','꼬르륵']],['⭐','별이 □ 빛나요.','반짝반짝',['주룩주룩','쌩쌩']],['⏰','시계가 □ 가요.','째깍째깍',['멍멍','펑펑']],['👶','아기가 □ 웃어요.','방긋방긋',['엉금엉금','쿵쿵']],['🚪','문을 □ 두드려요.','똑똑',['꿀꿀','살랑살랑']],['😋','배에서 □ 소리가 나요.','꼬르륵',['째깍째깍','반짝반짝']],['🌬️','찬 바람이 □ 불어요.','쌩쌩',['방긋방긋','뒤뚱뒤뚱']],['❄️','함박눈이 □ 내려요.','펑펑',['똑똑','꼬르륵']],['🦋','나비가 □ 날아가요.','훨훨',['엉금엉금','쿵쿵']],['🐷','돼지가 □ 울어요.','꿀꿀',['야옹','꽥꽥']]];
+const K2_ANT=[['크다','작다'],['길다','짧다'],['무겁다','가볍다'],['덥다','춥다'],['많다','적다'],['높다','낮다'],['넓다','좁다'],['빠르다','느리다'],['열다','닫다'],['기쁘다','슬프다'],['밝다','어둡다'],['깊다','얕다'],['두껍다','얇다'],['입다','벗다'],['앞','뒤'],['위','아래']];
+const K2_SYN=[['기쁘다','즐겁다'],['예쁘다','아름답다'],['아이','어린이'],['길','도로'],['고치다','수리하다'],['무섭다','두렵다'],['화나다','성나다'],['걱정','근심']];
+const K2_MOD=[['🌌','밤하늘에 □ 별이 떠요.','반짝이는',['시끄러운','짭짤한']],['🍦','□ 아이스크림을 먹어요.','차가운',['뜨거운','매운']],['🔥','모닥불이 □ 타올라요.','활활',['살금살금','엉금엉금']],['🍯','꿀은 맛이 □.','달아요',['짜요','셔요']],['🐘','코끼리는 몸집이 □.','커요',['작아요','가벼워요']],['🐜','개미는 몸집이 □.','작아요',['커요','무거워요']],['🍋','레몬은 맛이 □.','셔요',['달아요','싱거워요']],['🧸','□ 곰 인형을 꼭 안아요.','폭신한',['뾰족한','따가운']],['🌵','선인장 가시는 □.','뾰족해요',['폭신해요','미끄러워요']],['🐢','거북이는 □ 걸어요.','느릿느릿',['재빨리','휙휙']]];
+const K2_HON=[['할머니께서 진지를 드세요.','할머니가 밥을 먹어.','할머니께서 밥을 먹어.'],['선생님께 인사를 드렸어요.','선생님한테 인사를 줬어.','선생님께 인사를 줬어요.'],['할아버지께서 주무세요.','할아버지가 자.','할아버지께서 자요.'],['아버지께서 회사에 가셨어요.','아버지가 회사에 갔어.','아버지께서 회사에 갔어.'],['할머니, 연세가 어떻게 되세요?','할머니, 몇 살이야?','할머니, 나이가 몇 살이에요?'],['어머니께 꽃을 드렸어요.','어머니께 꽃을 줬어.','엄마한테 꽃을 줬어.'],['선생님, 안녕히 계세요.','선생님, 잘 있어.','선생님, 안녕.'],['할아버지께서 말씀하셨어요.','할아버지가 말했어.','할아버지께서 말했어.']];
+const K2_READ=[
+ ['민수는 토요일에 아빠와 공원에 갔어요. 공원에서 연을 날렸어요. 바람이 세게 불어서 연이 하늘 높이 날았어요.',[['민수는 누구와 공원에 갔나요?','아빠',['엄마','친구']],['연이 높이 난 까닭은?','바람이 세게 불어서',['비가 와서','해가 져서']],['민수가 공원에 간 날은?','토요일',['일요일','월요일']]]],
+ ['지우네 반은 교실에서 강낭콩을 키워요. 지우는 매일 아침 물을 주었어요. 일주일이 지나자 작은 싹이 났어요.',[['지우네 반이 키우는 것은?','강낭콩',['해바라기','토마토']],['지우가 매일 아침 한 일은?','물 주기',['청소하기','노래하기']],['일주일 뒤에 생긴 일은?','싹이 났어요',['꽃이 졌어요','열매가 열렸어요']]]],
+ ['오늘은 할머니 생신이에요. 나는 할머니께 드릴 카드를 만들었어요. 카드에 "할머니, 건강하세요."라고 썼어요.',[['오늘은 무슨 날인가요?','할머니 생신',['어린이날','설날']],['내가 만든 것은?','카드',['케이크','목도리']]]],
+ ['개미는 여름 내내 열심히 먹이를 모았어요. 베짱이는 노래만 불렀어요. 겨울이 오자 베짱이는 먹을 것이 없었어요.',[['여름에 열심히 일한 것은?','개미',['베짱이','나비']],['베짱이가 겨울에 먹을 것이 없었던 까닭은?','노래만 불러서',['비가 와서','개미가 가져가서']]]],
+ ['우리 마을에는 소방서가 있어요. 소방관은 불을 끄고 사람들을 구해요. 나는 커서 용감한 소방관이 되고 싶어요.',[['소방관이 하는 일은?','불을 끄고 사람을 구해요',['편지를 배달해요','아픈 사람을 치료해요']],['글쓴이의 꿈은?','소방관',['의사','요리사']]]],
+ ['비가 그치자 하늘에 무지개가 떴어요. 동생이 "와, 일곱 가지 색이다!" 하고 소리쳤어요. 우리는 무지개를 그림으로 그렸어요.',[['하늘에 뜬 것은?','무지개',['구름','별']],['동생이 소리친 까닭은?','무지개를 보아서',['넘어져서','배가 고파서']]]],
+];
+const K2_READQ=K2_READ.flatMap(([p,qs])=>qs.map(q=>[p,...q]));
+
+const vert=(a,op,b)=>`<div class="vert"><span></span><span>${a}</span><span>${op}</span><span>${b}</span><span class="vl"></span><span class="vl">□</span></div>`;
+const groupVis=(n,m,e)=>`<div class="emo-row" style="gap:12px">${Array.from({length:m},()=>`<span class="grp">${e.repeat(n)}</span>`).join('')}</div>`;
+function rulerSVG(s,L){const u=24,x=c=>10+c*u;let g=`<svg viewBox="0 0 ${x(12)+10} 70" class="ruler"><rect class="rbar" x="${x(s)}" y="5" width="${L*u}" height="17" rx="4"/><rect class="rbody" x="4" y="27" width="${x(12)+2}" height="40" rx="4"/>`;
+  for(let i=0;i<=24;i++){const c=i/2,h=i%2?7:13;g+=`<line class="rtick" x1="${x(c)}" x2="${x(c)}" y1="27" y2="${27+h}"/>`;if(i%2===0)g+=`<text class="rnum" x="${x(c)}" y="58" text-anchor="middle" font-size="11">${c}</text>`}
+  return g+'</svg>'}
+function polySVG(n){if(!n)return'<svg viewBox="0 0 100 100"><circle class="shape" cx="50" cy="50" r="38" stroke-width="3"/></svg>';const r0=R()*Math.PI;const pts=Array.from({length:n},(_,i)=>{const a=r0+i*2*Math.PI/n;return`${(50+38*Math.cos(a)).toFixed(1)},${(50+38*Math.sin(a)).toFixed(1)}`}).join(' ');return`<svg viewBox="0 0 100 100"><polygon class="shape" points="${pts}" stroke-width="3" stroke-linejoin="round"/></svg>`}
+const SHAPES=[['삼각형',3],['사각형',4],['오각형',5],['육각형',6],['원',0]];
+const clab=(h,m)=>{h=((h-1)%12+12)%12+1;return m?`${h}시 ${m}분`:`${h}시`};
+const FRUIT=[['🍎','사과'],['🍌','바나나'],['🍇','포도'],['🍓','딸기']];
+const PAT=['🔺','🟦','🟡','⭐','🌙','❤️'];
+
+const E2_CVC=[['cat','🐱','a'],['pig','🐷','i'],['bed','🛏️','e'],['sun','☀️','u'],['dog','🐶','o'],['hat','🎩','a'],['bus','🚌','u'],['fox','🦊','o'],['leg','🦵','e'],['pen','🖊️','e'],['bag','👜','a'],['cup','🥤','u'],['box','📦','o'],['six','6️⃣','i'],['web','🕸️','e'],['map','🗺️','a'],['bug','🐛','u'],['lip','👄','i']];
+const E2_VOC=[['eye','👁️'],['ear','👂'],['nose','👃'],['mouth','👄'],['hand','✋'],['foot','🦶'],['pencil','✏️'],['book','📖'],['bag','🎒'],['chair','🪑'],['mom','👩'],['dad','👨'],['baby','👶'],['grandma','👵'],['school','🏫'],['milk','🥛'],['water','💧'],['rice','🍚'],['bread','🍞'],['desk','🗄️']];
+const E2_SIT=[['🌅','아침에 선생님을 만났어요.','Good morning!',['Good night!','Thank you!']],['🎁','친구가 선물을 줬어요.','Thank you!',['Sorry!','Goodbye!']],['😣','친구 발을 밟았어요.',"I'm sorry.",['Thank you.','Good job!']],['👋','집에 갈 때 친구에게','Goodbye!',['Hello!','Good morning!']],['🌙','잠자기 전에 가족에게','Good night!',['Good morning!','Nice to meet you.']],['🤝','처음 만난 친구에게','Nice to meet you.',['See you later.',"I'm sorry."]]];
+const E2_QA=[['🙂','How are you?',"I'm fine, thank you.",["I'm eight.","It's a cat."]],['🐶',"What's this?","It's a dog.",["I'm fine.",'Yes, I do.']],['🎂','How old are you?',"I'm eight.",["I'm fine.","It's red."]],['🍎','Do you like apples?','Yes, I do.',["It's a pen.","I'm eight."]],['🔵','What color is it?',"It's blue.",["I'm fine.",'Yes, I can.']],['🏊','Can you swim?','Yes, I can.',["It's blue.",'Goodbye.']],['📛',"What's your name?","I'm Minjun.",["I'm fine.","It's a book."]]];
+const E2_SENT=[['I like bananas.','🍌',['🍎','🍇']],['I can swim.','🏊',['🏃','🚴']],['I can run.','🏃',['🏊','😴']],['This is my bag.','🎒',['📖','✏️']],["It's sunny.",'☀️',['🌧️','❄️']],["It's raining.",'🌧️',['☀️','⛄']],["It's snowing.",'❄️',['☀️','🌧️']],['I have a cat.','🐱',['🐶','🐟']],['Open the door.','🚪',['🪟','📦']],['Sit down, please.','🪑',['🏃','🛏️']],["I'm hungry.",'😋',['😴','😢']],["I'm sleepy.",'😴',['😋','😃']]];
+const NUMW2=['','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen','twenty'];
+
+const S2_ME=[['🧼','손은 비누로 몇 초 이상 씻어야 할까요?','30초',['3초','1초']],['🥦','몸이 튼튼해지려면?','골고루 먹어요',['과자만 먹어요','밥을 굶어요']],['😴','어린이가 건강하려면 밤에?','일찍 자요',['밤새 게임해요','늦게까지 TV를 봐요']],['🦴','우리 몸을 받쳐 주는 단단한 것은?','뼈',['머리카락','손톱']],['❤️','달리기를 하면 빨리 뛰는 것은?','심장',['코','귀']],['🫁','숨을 쉴 때 공기가 들어가는 곳은?','폐(허파)',['위','뼈']],['📏','작년보다 키가 크고 몸무게가 늘었어요. 이것은?','몸이 자랐어요',['몸이 줄었어요','그대로예요']],['🪥','밥을 먹은 뒤에 해야 할 일은?','이 닦기',['바로 눕기','사탕 먹기']]];
+const S2_NAT=[['🦗','여름밤에 풀숲에서 우는 곤충은?','귀뚜라미',['나비','개미']],['🐻','겨울잠을 자는 동물은?','곰',['참새','강아지']],['🐸','개구리는 추운 겨울에 무엇을 할까요?','겨울잠을 자요',['알을 낳아요','노래해요']],['🍁','가을에 나뭇잎은 어떻게 변할까요?','빨갛고 노랗게 물들어요',['더 초록색이 돼요','하얗게 변해요']],['🌱','봄이 되면 나무에는?','새싹이 돋아요',['잎이 모두 떨어져요','눈이 쌓여요']],['🐦','봄에 따뜻한 남쪽에서 날아오는 철새는?','제비',['펭귄','닭']],['❄️','물이 얼면 무엇이 될까요?','얼음',['수증기','모래']],['☀️','여름에는 낮과 밤 중 무엇이 더 길까요?','낮',['밤','똑같아요']]];
+const S2_LIFE=[['🦋','나비: 알 → 애벌레 → □ → 나비','번데기',['올챙이','병아리']],['🐸','개구리: 알 → □ → 개구리','올챙이',['애벌레','번데기']],['🐔','닭: 알 → □ → 닭','병아리',['올챙이','애벌레']],['🐛','애벌레가 자라서 되는 것은?','번데기',['알','올챙이']],['🐟','올챙이는 어디에서 살까요?','물속',['나무 위','땅속']],['🐣','알에서 깨어나는 동물은?','병아리',['강아지','송아지']],['🐶','새끼를 낳는 동물은?','강아지',['닭','개구리']],['🥬','배추흰나비 애벌레가 먹는 것은?','배추 잎',['고기','모래']]];
+const S2_ANI=[['🐜','다리가 6개인 곤충은?','개미',['거미','지렁이']],['🕷️','거미의 다리는 몇 개일까요?','8개',['6개','4개']],['🐍','다리가 없는 동물은?','뱀',['개미','닭']],['🦅','날개가 있어 하늘을 나는 동물은?','독수리',['토끼','거북']],['🐟','물고기는 무엇으로 숨을 쉴까요?','아가미',['코','날개']],['🐝','곤충의 몸은 몇 부분으로 나뉠까요?','3부분 (머리·가슴·배)',['2부분','5부분']],['🐧','날개가 있지만 날지 못하는 새는?','펭귄',['참새','독수리']],['🐢','등에 단단한 껍데기가 있는 동물은?','거북',['토끼','개구리']]];
+const S2_PLANT=[['🌼','민들레 씨는 어떻게 퍼질까요?','바람에 날려서',['물에 떠서','땅을 파고 들어가서']],['🌰','도꼬마리 열매는 어떻게 퍼질까요?','동물 털에 붙어서',['바람에 날려서','물에 떠서']],['🌱','씨앗이 싹 트는 데 꼭 필요한 것은?','물',['돌','소금']],['🥕','당근에서 우리가 먹는 부분은?','뿌리',['꽃','열매']],['🥬','배추에서 우리가 먹는 부분은?','잎',['뿌리','열매']],['🍅','토마토에서 우리가 먹는 부분은?','열매',['뿌리','줄기']],['🥔','감자는 식물의 어느 부분일까요?','땅속줄기',['열매','꽃']],['🌳','나무가 쓰러지지 않게 땅을 꽉 잡아 주는 것은?','뿌리',['꽃','열매']]];
+const S2_MAT=[['🥛','안이 잘 보이는 투명한 컵의 재료는?','유리',['나무','종이 상자']],['🪑','책상과 의자를 만드는 데 많이 쓰는 재료는?','나무',['유리','얼음']],['🎈','잘 늘어나는 풍선의 재료는?','고무',['유리','돌']],['☂️','우산 천은 어떤 성질이 있어야 할까요?','물이 스며들지 않아요',['물을 잘 빨아들여요','잘 찢어져요']],['🔨','망치 머리를 쇠로 만드는 까닭은?','단단해서',['가벼워서','말랑해서']],['🧊','얼음을 따뜻한 곳에 두면?','물이 돼요',['돌이 돼요','더 단단해져요']],['🫗','물을 다른 그릇에 옮겨 담으면?','그릇에 따라 모양이 바뀌어요',['항상 동그래요','모양이 그대로예요']],['🪨','돌을 손으로 누르면?','모양이 변하지 않아요',['쭉 늘어나요','물처럼 흘러요']]];
+const S2_MAG=[['🧲','자석의 N극과 S극을 가까이 하면?','서로 끌어당겨요',['서로 밀어내요','아무 일도 없어요']],['🧲','자석의 N극과 N극을 가까이 하면?','서로 밀어내요',['서로 끌어당겨요','녹아 버려요']],['🧭','나침반 바늘의 N극이 가리키는 방향은?','북쪽',['남쪽','아래쪽']],['📎','자석에 붙는 물체는?','쇠 클립',['종이','플라스틱 자']],['🧲','막대자석에서 쇠를 끌어당기는 힘이 가장 센 곳은?','양 끝',['가운데','모든 곳이 같아요']],['🥄','자석에 붙지 않는 것은?','나무 숟가락',['쇠 숟가락','쇠못']],['📄','자석은 종이 한 장을 사이에 두고도?','쇠를 끌어당길 수 있어요',['힘이 없어져요','종이를 붙여요']]];
+const S2_LIGHT=[['🔦','물체가 빛을 막으면 생기는 것은?','그림자',['무지개','거울']],['☀️','해가 높이 뜬 한낮에 그림자 길이는?','짧아요',['가장 길어요','매우 길어요']],['🌅','해가 질 무렵 그림자 길이는?','길어요',['짧아요','사라져요']],['🥁','북을 세게 치면 소리는?','커져요',['작아져요','안 나요']],['🎸','소리가 날 때 기타 줄은?','떨려요',['멈춰 있어요','녹아요']],['🪞','얼굴을 비춰 볼 수 있는 물건은?','거울',['종이','나무판']],['🔊','멀리 떨어질수록 소리는?','작게 들려요',['더 크게 들려요','똑같아요']],['🌈','비가 그친 뒤 햇빛이 비치면 생기기도 하는 것은?','무지개',['그림자','번개']]];
+const S2_TOWN=[['🩺','아픈 사람을 치료하는 사람은?','의사',['소방관','집배원']],['🚒','불을 끄는 사람은?','소방관',['요리사','의사']],['✉️','편지와 소포를 배달하는 사람은?','집배원',['경찰관','농부']],['👮','마을의 안전을 지키는 사람은?','경찰관',['미용사','제빵사']],['🌾','논밭에서 쌀과 채소를 기르는 사람은?','농부',['어부','소방관']],['🐟','바다에서 물고기를 잡는 사람은?','어부',['농부','의사']],['🇯🇵','"곤니치와"라고 인사하는 나라는?','일본',['중국','미국']],['🇨🇳','"니하오"라고 인사하는 나라는?','중국',['일본','프랑스']],['🇰🇷','우리나라의 전통 옷은?','한복',['기모노','드레스']],['🗽','자유의 여신상이 있는 나라는?','미국',['한국','중국']]];
+
+const LEVELS2={
+kor:[
+ {name:'소리와 다르게 쓰는 낱말',area:'문법',desc:'소리 나는 대로가 아니라 바르게 써요',gen(){const [p,a,w]=pick(K2_LINK);return{key:p,vis:`<div class="say">[${p}]</div>`,text:'바르게 쓴 것은?',say:`${p}. 바르게 쓴 낱말은 무엇일까요?`,choices:shuffle([a,p,w]),ans:a,big:true}}},
+ {name:'헷갈리는 낱말',area:'쓰기',desc:'낫다/낳다, 닫다/닿다 바르게 쓰기',gen:sentGen(K2_SPELL,'알맞은 낱말은?')},
+ {name:'문장 부호',area:'문법',desc:'마침표, 물음표, 느낌표, 쉼표',gen(){const [s,a]=pick(K2_PUNCT);return{key:s,vis:`<div class="sent">${esc(s).replace('□','<span class="blank"></span>')}</div>`,text:'□에 알맞은 문장 부호는?',say:s.replace('□','')+'. 빈칸에 알맞은 문장 부호는 무엇일까요?',choices:['.','?','!',','],ans:a,labels:PUNCT_L,big:true}}},
+ {name:'흉내 내는 말',area:'문학',desc:'소리와 모양을 흉내 내는 말',gen:sentGen(K2_MIMIC,'알맞은 흉내 내는 말은?')},
+ {name:'반대말과 비슷한 말',area:'문법',desc:'낱말 사이의 관계',gen(){if(R()<.7){const [w,a]=pick(K2_ANT);return{key:'A'+w,vis:`<div class="big" style="font-size:3.6rem">${w}</div>`,text:'뜻이 반대인 말은?',say:`${w}. 뜻이 반대인 말은 무엇일까요?`,choices:mc(a,K2_ANT.map(x=>x[1])),ans:a}}
+   const [w,a]=pick(K2_SYN);return{key:'S'+w,vis:`<div class="big" style="font-size:3.6rem">${w}</div>`,text:'뜻이 비슷한 말은?',say:`${w}. 뜻이 비슷한 말은 무엇일까요?`,choices:mc(a,[...K2_SYN.map(x=>x[1]),...K2_ANT.map(x=>x[1])]),ans:a}}},
+ {name:'꾸며 주는 말',area:'쓰기',desc:'문장을 실감 나게 꾸며요',gen:sentGen(K2_MOD,'가장 잘 어울리는 말은?')},
+ {name:'높임 표현',area:'듣기·말하기',desc:'웃어른께 바르게 말하기',gen(){const [a,...w]=pick(K2_HON);return{key:a,vis:'<div>👵🧑‍🏫👴</div>',text:'웃어른께 바르게 말한 것은?',say:'웃어른께 바르게 말한 것을 골라요.',choices:shuffle([a,...w]),ans:a,sayAns:a}}},
+ {name:'글 읽고 답하기',area:'읽기',desc:'누가, 언제, 무엇을, 왜',gen(){const [p,q,a,w]=pick(K2_READQ);return{key:q,vis:`<div class="passage">${esc(p)}</div>`,text:q,say:p+' '+q,choices:shuffle([a,...w]),ans:a}}},
+],
+math:[
+ {name:'세 자리 수',area:'수와 연산',desc:'자릿값, 뛰어 세기, 크기 비교',gen(){const t=ri(0,3);
+   if(t===0){const h=ri(1,9),te=ri(0,9),o=ri(0,9);const n=h*100+te*10+o;return{key:'m'+n,vis:`<div class="formula" style="font-size:2rem;line-height:1.5">100이 ${h}개<br>10이 ${te}개<br>1이 ${o}개</div>`,text:'모두 얼마일까요?',say:`100이 ${h}개, 10이 ${te}개, 1이 ${o}개이면 얼마일까요?`,input:'num',ans:String(n)}}
+   if(t===1){const n=ri(101,999);const d=String(n).split('');let p=ri(0,2);while(d[p]==='0')p=ri(0,2);const val=+d[p]*[100,10,1][p];const sh=d.map((c,i)=>i===p?`<u>${c}</u>`:c).join('');
+     return{key:'pv'+n+p,vis:`<div class="big">${sh}</div>`,text:'밑줄 친 숫자가 나타내는 값은?',say:`${n}에서 밑줄 친 숫자는 얼마를 나타낼까요?`,choices:mc(String(val),[d[p],String(+d[p]*10),String(+d[p]*100),String(+d[p]*1000)]),ans:String(val),big:true}}
+   if(t===2){const st=pick([1,10,100]);const s=ri(100,999-4*st);return{key:'sk'+s+st,vis:`<div class="formula">${s} - ${s+st} - ${s+2*st} - □</div>`,text:'규칙에 따라 뛰어 세면?',say:'규칙에 맞게 빈칸에 들어갈 수는?',input:'num',ans:String(s+3*st)}}
+   const h=ri(1,9);const arr=[];while(arr.length<3){const n=h*100+ri(0,99);if(!arr.includes(n))arr.push(n)}const mx=String(Math.max(...arr));
+   return{key:'cmp'+arr.join(),vis:'',text:'가장 큰 수는?',say:`${arr.join(', ')} 중에서 가장 큰 수는?`,choices:arr.map(String),ans:mx,big:true}}},
+ {name:'받아올림 있는 덧셈',area:'수와 연산',desc:'두 자리 수 + 두 자리 수',gen(){let a=ri(15,89);while(a%10===0)a=ri(15,89);const b=ri(1,8)*10+ri(10-a%10,9);
+   return{key:`${a}+${b}`,vis:vert(a,'+',b),text:'계산해 보세요',say:`${a} 더하기 ${b}는?`,input:'num',ans:String(a+b)}}},
+ {name:'받아내림 있는 뺄셈',area:'수와 연산',desc:'두 자리 수 − 두 자리 수',gen(){let a=ri(30,98);while(a%10===9)a=ri(30,98);const b=ri(1,Math.floor(a/10)-1)*10+ri(a%10+1,9);
+   return{key:`${a}-${b}`,vis:vert(a,'−',b),text:'계산해 보세요',say:`${a} 빼기 ${b}는?`,input:'num',ans:String(a-b)}}},
+ {name:'□가 있는 식, 세 수의 계산',area:'수와 연산',desc:'덧셈과 뺄셈의 관계',gen(){const t=ri(0,4);let f,a;const x=ri(11,49),y=ri(5,39);
+   if(t===0){f=`□ + ${y} = ${x+y}`;a=x}else if(t===1){f=`${x} + □ = ${x+y}`;a=y}else if(t===2){f=`□ − ${y} = ${x}`;a=x+y}else if(t===3){f=`${x+y} − □ = ${x}`;a=y}else{const z=ri(3,9);f=`${x} + ${y} − ${z} = □`;a=x+y-z}
+   return{key:f,vis:`<div class="formula">${f}</div>`,text:'□에 알맞은 수는?',say:'빈칸에 알맞은 수를 구해 보세요.',input:'num',ans:String(a)}}},
+ {name:'곱셈의 뜻',area:'수와 연산',desc:'묶어 세기와 곱셈식',gen(){const n=pick([2,3,4,5]),m=ri(2,5),e=pick(['🍎','🍪','⭐','🐟']);
+   if(R()<.5)return{key:`g${n}x${m}`,vis:groupVis(n,m,e),text:`${n}씩 ${m}묶음은 모두 몇 개?`,say:`${n}씩 ${m}묶음은 모두 몇 개일까요?`,input:'num',ans:String(n*m)};
+   const a=`${n} × ${m}`;return{key:`e${n}x${m}`,vis:groupVis(n,m,e),text:'곱셈식으로 나타내면?',say:'그림을 곱셈식으로 나타내 보세요.',choices:mc(a,[`${n} + ${m}`,`${m} × ${m}`,`${n} × ${m+1}`,`${n+m} × ${m}`]),ans:a,big:true}}},
+ {name:'곱셈구구',area:'수와 연산',desc:'2단부터 9단까지',gen(){const a=ri(2,9),b=ri(1,9);
+   if(R()<.75)return{key:`${a}x${b}`,vis:`<div class="formula">${a} × ${b} = □</div>`,text:'곱셈구구',say:`${a} 곱하기 ${b}는?`,input:'num',ans:String(a*b)};
+   return{key:`?x${b}=${a*b}`,vis:`<div class="formula">□ × ${b} = ${a*b}</div>`,text:'□에 알맞은 수는?',say:`무엇 곱하기 ${b}는 ${a*b}일까요?`,input:'num',ans:String(a)}}},
+ {name:'길이 재기',area:'도형과 측정',desc:'cm와 m, 길이의 덧셈',gen(){const t=ri(0,3);
+   if(t===0){const L=ri(2,9),s=R()<.35?ri(1,3):0;return{key:`r${s}-${L}`,vis:`<div class="vis svgr">${rulerSVG(s,L)}</div>`,text:'노란 막대의 길이는 몇 cm?',say:'노란 막대의 길이는 몇 센티미터일까요?',input:'num',ans:String(L)}}
+   if(t===1){const m=ri(1,3),c=ri(5,95);return{key:`c${m}-${c}`,vis:`<div class="formula">${m} m ${c} cm = □ cm</div>`,text:'몇 cm일까요?',say:`${m}미터 ${c}센티미터는 몇 센티미터일까요?`,input:'num',ans:String(m*100+c)}}
+   if(t===2){const n=ri(101,399),m=Math.floor(n/100),c=n%100;const lab=(m,c)=>`${m} m ${c} cm`;const a=lab(m,c);return{key:'d'+n,vis:`<div class="formula">${n} cm = ?</div>`,text:'몇 m 몇 cm일까요?',say:`${n}센티미터는 몇 미터 몇 센티미터일까요?`,choices:mc(a,[lab(m+1,c),lab(m,(c+10)%100),lab(Math.floor(n/10),n%10)]),ans:a}}
+   const a=ri(1,3),b=ri(10,40),c=ri(1,3),d=ri(10,50);return{key:`a${a}${b}${c}${d}`,vis:`<div class="formula" style="font-size:2rem">${a} m ${b} cm + ${c} m ${d} cm</div>`,text:'두 길이를 더하면?',say:'두 길이를 더하면 얼마일까요?',choices:mc(`${a+c} m ${b+d} cm`,[`${a+c} m ${b+d+10} cm`,`${a+c+1} m ${b+d} cm`,`${a+c} m ${Math.abs(b-d)} cm`]),ans:`${a+c} m ${b+d} cm`}}},
+ {name:'시각과 시간',area:'도형과 측정',desc:'몇 시 몇 분, 1시간 = 60분',gen(){const t=ri(0,2);
+   if(t===0){const h=ri(1,12),m=ri(1,11)*5;const a=clab(h,m);return{key:`k${h}:${m}`,vis:`<div class="vis svgc">${clockSVG(h,m)}</div>`,text:'몇 시 몇 분일까요?',say:'시계를 보고 몇 시 몇 분인지 골라요.',choices:mc(a,[clab(h,m/5),clab(h+1,m),clab(h,(m+30)%60||30),clab(h-1,m)].filter(x=>x!==a)),ans:a}}
+   if(t===1){const [f,a]=pick([['1시간 = □분','60'],['하루 = □시간','24'],['1주일 = □일','7'],['1년 = □개월','12'],['1시간 20분 = □분','80'],['90분 = 1시간 □분','30'],['2시간 = □분','120']]);return{key:f,vis:`<div class="formula" style="font-size:2.4rem">${f}</div>`,text:'□에 알맞은 수는?',say:f.replace('□','몇')+'일까요?',input:'num',ans:a}}
+   const h=ri(1,10),m=pick([0,10,20,30,40]),add=pick([20,30,40,50,70,90]);const tot=h*60+m+add;const a=clab(Math.floor(tot/60),tot%60);
+   return{key:`e${h}${m}${add}`,vis:`<div class="formula" style="font-size:2.2rem">${clab(h,m)}에서<br>${add}분 뒤</div>`,text:'몇 시 몇 분이 될까요?',say:`${clab(h,m)}에서 ${add}분이 지나면 몇 시 몇 분일까요?`,choices:mc(a,[clab(Math.floor((tot-10)/60),(tot-10)%60),clab(Math.floor((tot+60)/60),tot%60),clab(h,(m+add)%60)]),ans:a}}},
+ {name:'규칙 찾기와 표',area:'변화와 관계 · 자료와 가능성',desc:'반복 규칙, 수 규칙, 표 읽기',gen(){const t=ri(0,2);
+   if(t===0){const len=ri(2,3);const unit=shuffle(PAT).slice(0,len);const seq=Array.from({length:7},(_,i)=>unit[i%len]);const a=unit[7%len];return{key:'p'+seq.join(''),vis:`<div class="emo-row" style="font-size:2.6rem">${seq.join('')}<span class="blank" style="width:1em"></span></div>`,text:'다음에 올 모양은?',say:'규칙을 찾아 다음에 올 모양을 골라요.',choices:mc(a,PAT),ans:a,big:true}}
+   if(t===1){const s=ri(1,20),k=ri(2,10);return{key:`n${s}+${k}`,vis:`<div class="formula">${s}, ${s+k}, ${s+2*k}, ${s+3*k}, □</div>`,text:'규칙에 맞는 수는?',say:'규칙을 찾아 빈칸에 알맞은 수를 구해요.',input:'num',ans:String(s+4*k)}}
+   const cnt=shuffle([2,3,4,5,6,7,8]).slice(0,4);const rows=FRUIT.map((f,i)=>`<tr><td>${f[0]} ${f[1]}</td><td>${cnt[i]}</td></tr>`).join('');const tbl=`<table class="tbl"><tr><th>과일</th><th>학생 수(명)</th></tr>${rows}<tr><td>합계</td><td>□</td></tr></table>`;
+   const qt=ri(0,2);if(qt===0){const mi=cnt.indexOf(Math.max(...cnt));return{key:'tb'+cnt.join(),vis:tbl,text:'가장 많은 학생이 좋아하는 과일은?',say:'표를 보고 가장 많은 학생이 좋아하는 과일을 골라요.',choices:FRUIT.map(f=>f[1]),ans:FRUIT[mi][1]}}
+   if(qt===1)return{key:'ts'+cnt.join(),vis:tbl,text:'합계 □는 몇 명일까요?',say:'표를 보고 모두 몇 명인지 구해요.',input:'num',ans:String(cnt.reduce((a,b)=>a+b,0))};
+   return{key:'td'+cnt.join(),vis:tbl,text:`${FRUIT[0][1]}는 ${FRUIT[1][1]}보다 몇 명 더 많거나 적을까요? (차이)`,say:'사과와 바나나를 좋아하는 학생 수의 차이는 몇 명일까요?',input:'num',ans:String(Math.abs(cnt[0]-cnt[1]))}}},
+ {name:'여러 가지 도형',area:'도형과 측정',desc:'삼각형, 사각형, 오각형, 육각형, 원',gen(){const t=ri(0,2);const [nm,n]=pick(SHAPES);
+   if(t===0)return{key:'s'+nm+ri(0,9),vis:`<div class="vis svgc">${polySVG(n)}</div>`,text:'이 도형의 이름은?',say:'이 도형의 이름은 무엇일까요?',choices:mc(nm,SHAPES.map(s=>s[0])),ans:nm};
+   if(t===1&&n)return{key:'v'+nm,vis:`<div class="vis svgc">${polySVG(n)}</div>`,text:'꼭짓점은 몇 개일까요?',say:'이 도형의 꼭짓점은 몇 개일까요?',input:'num',ans:String(n)};
+   const [q,a]=pick([['변이 3개인 도형은?','삼각형'],['꼭짓점이 6개인 도형은?','육각형'],['곧은 선이 없고 둥근 도형은?','원'],['변이 5개인 도형은?','오각형'],['꼭짓점이 4개인 도형은?','사각형']]);
+   return{key:'q'+q,vis:'',text:q,say:q,choices:mc(a,SHAPES.map(s=>s[0])),ans:a}}},
+],
+eng:[
+ {name:'알파벳 순서',area:'3학년 영어 준비',desc:'빠진 알파벳 찾기',gen(){const lower=R()<.5;const i=ri(0,22);const seq=ABC.slice(i,i+4).map(c=>lower?c.toLowerCase():c);const m=ri(0,3);const a=seq[m];const show=seq.map((c,j)=>j===m?'□':c).join(' ');
+   return{key:'o'+show,vis:`<div class="big" style="font-size:3.4rem">${show}</div>`,text:'□에 알맞은 알파벳은?',say:'빈칸에 들어갈 알파벳은 무엇일까요?',choices:mc(a,ABC.map(c=>lower?c.toLowerCase():c)),ans:a,big:true,sayAns:a.toUpperCase(),ansLang:'en'}}},
+ {name:'단모음 파닉스',area:'3학년 영어 준비',desc:'a, e, i, o, u 소리 구별',gen(){const [w,e,v]=pick(E2_CVC);const gap=w.split('').map(c=>c===v?'_':c).join(' ');
+   return{key:'v'+w,vis:`<div>${e}</div><div class="big" style="font-size:3rem">${gap}</div>`,text:'빈칸에 들어갈 모음은?',say:w,lang:'en',choices:shuffle(['a','e','i','o','u']).filter(x=>x!==v).slice(0,2).concat(v).sort(),ans:v,big:true,reveal:`${e} ${w}`,sayAns:w,ansLang:'en'}}},
+ {name:'듣고 단어 읽기',area:'3학년 영어 준비',desc:'소리를 듣고 맞는 철자 고르기',gen(){const [w,e,v]=pick(E2_CVC);const alt=['a','e','i','o','u'].filter(x=>x!==v).map(x=>w.replace(v,x));
+   return{key:'h'+w,vis:'<div>👂</div>',text:'들은 단어를 골라요',say:w,lang:'en',choices:shuffle([w,...shuffle(alt).slice(0,2)]),ans:w,reveal:`${e} ${w}`,sayAns:w,ansLang:'en'}}},
+ {name:'생활 낱말',area:'3학년 영어 준비',desc:'몸, 가족, 학교, 음식',gen(){const [w,e]=pick(E2_VOC);
+   return{key:'w'+w,vis:`<div>${e}</div>`,text:'그림에 맞는 단어는?',say:'Which word is it?',lang:'en',choices:mc(w,E2_VOC.map(x=>x[0])),ans:w,sayAns:w,ansLang:'en'}}},
+ {name:'인사와 기본 표현',area:'3학년 영어 준비',desc:'상황에 맞는 말, 묻고 답하기',gen(){if(R()<.5){const [e,s,a,w]=pick(E2_SIT);return{key:'s'+s,vis:`<div>${e}</div><div class="say" style="font-size:1.6rem">${esc(s)}</div>`,text:'뭐라고 말할까요?',say:s+' 뭐라고 말할까요?',choices:shuffle([a,...w]),ans:a,sayAns:a,ansLang:'en'}}
+   const [e,q,a,w]=pick(E2_QA);return{key:'q'+q,vis:`<div>${e}</div><div class="big" style="font-size:2.4rem">${esc(q)}</div>`,text:'알맞은 대답은?',say:q,lang:'en',choices:shuffle([a,...w]),ans:a,sayAns:a,ansLang:'en'}}},
+ {name:'문장 듣고 그림 찾기',area:'3학년 영어 준비',desc:'짧은 문장의 뜻 알기',gen(){const [s,a,w]=pick(E2_SENT);
+   return{key:'t'+s,vis:`<div class="big" style="font-size:2.4rem">${esc(s)}</div>`,text:'문장에 맞는 그림은?',say:s,lang:'en',choices:shuffle([a,...w]),ans:a,big:true,sayAns:s,ansLang:'en'}}},
+ {name:'숫자 11~20',area:'3학년 영어 준비',desc:'eleven부터 twenty까지',gen(){const n=ri(11,20);
+   return{key:'n'+n,vis:`<div class="big">${n}</div>`,text:'영어로 어떻게 쓸까요?',say:'How do you say this number?',lang:'en',choices:mc(NUMW2[n],NUMW2.slice(11).concat(['three','five','eight'])),ans:NUMW2[n],sayAns:NUMW2[n],ansLang:'en'}}},
+],
+sci:[
+ {name:'나: 몸과 건강',area:'통합교과 · 나',desc:'우리 몸과 건강한 생활',gen:qaGen(S2_ME)},
+ {name:'자연: 계절의 변화',area:'통합교과 · 자연',desc:'계절에 따라 달라지는 동식물',gen:qaGen(S2_NAT)},
+ {name:'동물의 한살이',area:'3학년 과학 준비',desc:'알 → 애벌레 → 번데기 → 어른벌레',gen:qaGen(S2_LIFE)},
+ {name:'동물 분류하기',area:'3학년 과학 준비',desc:'다리, 날개, 숨 쉬는 방법',gen:qaGen(S2_ANI)},
+ {name:'식물의 생활',area:'통합교과 · 자연',desc:'씨앗 퍼지기, 먹는 부분',gen:qaGen(S2_PLANT)},
+ {name:'물체와 물질',area:'3학년 과학 준비',desc:'재료의 성질, 고체와 액체',gen:qaGen(S2_MAT)},
+ {name:'자석의 성질',area:'3학년 과학 준비',desc:'N극과 S극, 나침반',gen:qaGen(S2_MAG)},
+ {name:'빛과 소리',area:'3학년 과학 준비',desc:'그림자, 떨림, 소리의 크기',gen:qaGen(S2_LIGHT)},
+ {name:'마을과 세계',area:'통합교과 · 마을 · 세계',desc:'마을 사람들의 일, 여러 나라',gen:qaGen(S2_TOWN)},
+]};
+const AREA1={kor:['한글 해득','한글 해득','한글 해득','한글 해득','읽기','읽기','읽기 · 쓰기'],math:['수와 연산','수와 연산','수와 연산','수와 연산','수와 연산','도형과 측정','수와 연산'],eng:['알파벳','알파벳','파닉스','듣기','어휘','어휘'],sci:['통합교과','통합교과','통합교과 · 계절','통합교과 · 나','탐구 놀이','탐구 놀이','통합교과 · 계절','통합교과 · 자연']};
+Object.keys(AREA1).forEach(k=>LEVELS1[k].forEach((l,i)=>l.area=AREA1[k][i]));
+let LEVELS=LEVELS1;
+
 const SUBJ={kor:{name:'국어',cls:'s-kor',color:'var(--kor)',soft:'var(--kor-soft)'},math:{name:'수학',cls:'s-math',color:'var(--math)',soft:'var(--math-soft)'},eng:{name:'영어',cls:'s-eng',color:'var(--eng)',soft:'var(--eng-soft)'},sci:{name:'과학',cls:'s-sci',color:'var(--sci)',soft:'var(--sci-soft)'}};
 const ORDER=['kor','math','eng','sci'];
 
 /* ================= state ================= */
 const KEY='hangeoreum.v1';
-const blank=()=>({name:'',n:5,voice:1,brk:1,level:{kor:0,math:0,eng:0,sci:0},unlocked:{kor:0,math:0,eng:0,sci:0},stars:{},log:[],review:[],stickers:[],daily:{}});
+const fresh=()=>({level:{kor:0,math:0,eng:0,sci:0},unlocked:{kor:0,math:0,eng:0,sci:0},stars:{}});
+const blank=()=>({name:'',n:5,voice:1,brk:1,grade:2,prog:{1:fresh(),2:fresh()},log:[],review:[],stickers:[],daily:{}});
 let S=blank();
-try{const r=localStorage.getItem(KEY);if(r)S=Object.assign(blank(),JSON.parse(r))}catch(e){}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+try{const r=localStorage.getItem(KEY);if(r){const old=JSON.parse(r);S=Object.assign(blank(),old);if(!old.prog&&old.level){S.prog={1:{level:old.level,unlocked:old.unlocked,stars:old.stars||{}},2:fresh()};S.grade=2}}}catch(e){}
+function bindGrade(){const g=S.grade===1?1:2;S.grade=g;S.prog[g]=S.prog[g]||fresh();const p=S.prog[g];['kor','math','eng','sci'].forEach(k=>{p.level[k]=p.level[k]||0;p.unlocked[k]=p.unlocked[k]||0});S.level=p.level;S.unlocked=p.unlocked;S.stars=p.stars;LEVELS=g===1?LEVELS1:LEVELS2}
+function setGrade(g){S.grade=g;bindGrade();save()}
+bindGrade();
+function save(){try{const {level,unlocked,stars,...rest}=S;localStorage.setItem(KEY,JSON.stringify(rest))}catch(e){}}
 const STK=['🦖','🚀','🦕','🚒','🐯','🏆','🚓','🛸','🐳','🦈','⚡','🌈','🎯','🪐','🐉','🏎️','🦁','🌋','🤖','🛩️'];
 
 /* ================= speech ================= */
@@ -508,11 +685,11 @@ function streak(){const days=new Set(S.log.map(l=>l.date));let n=0;const d=new D
 function renderHome(){
   const t=dkey(),done=S.daily[t]||{};
   $('hello').textContent=S.name?`${S.name}, 오늘도 한 걸음!`:'오늘도 한 걸음!';
-  $('streakTag').textContent=`연속 ${streak()}일`;
+  $('streakTag').textContent=`연속 ${streak()}일`;$('gradeTag').textContent=`${S.grade}학년`;
   $('todaySteps').innerHTML=ORDER.map(k=>`<div class="step ${done[k]?'done':''}" style="${done[k]?`background:${SUBJ[k].soft};border-color:${SUBJ[k].color}`:''}"><b>${done[k]?'✔':'·'}</b>${SUBJ[k].name}</div>`).join('');
   const all=ORDER.every(k=>done[k]);
   $('startDaily').textContent=all?'오늘 공부 완료! 한 번 더 하기':(Object.keys(done).length?'이어서 하기':'오늘의 공부 시작');
-  $('todayHint').textContent=all?'오늘 몫을 다 했어요. 더 하고 싶으면 아래에서 골라 연습해요.':`네 과목을 ${S.n}문제씩, 15분이면 끝나요.`;
+  $('todayHint').textContent=all?'오늘 몫을 다 했어요. 더 하고 싶으면 아래에서 골라 연습해요.':`네 과목을 ${S.n}문제씩, ${S.grade===1?15:20}분이면 끝나요.`;
   $('subjTiles').innerHTML=ORDER.map(k=>{const L=LEVELS[k],lv=S.level[k];return`<button class="subj ${SUBJ[k].cls}" data-s="${k}"><span class="nm">${SUBJ[k].name}</span><span class="lv">${lv+1}단계 · ${L[lv].name}</span><span class="bar"><i style="width:${Math.round((S.unlocked[k]+((S.stars[k+S.unlocked[k]]||0)/2))/L.length*100)}%"></i></span></button>`}).join('');
   $('stkCount').textContent=`${S.stickers.length}개`;
   const slots=Math.max(20,Math.ceil((S.stickers.length+1)/10)*10);
@@ -520,13 +697,13 @@ function renderHome(){
 }
 $('subjTiles').addEventListener('click',e=>{const b=e.target.closest('[data-s]');if(b)openLevels(b.dataset.s)});
 function openLevels(k){const L=LEVELS[k];$('lvTag').textContent=SUBJ[k].name;$('lvTag').style.background=SUBJ[k].soft;$('lvTitle').textContent=`${SUBJ[k].name} 단계 고르기`;
-  $('lvList').innerHTML=L.map((l,i)=>{const open=i<=S.unlocked[k];const st=S.stars[k+i]||0;return`<button class="subj ${SUBJ[k].cls}" style="min-height:auto;flex-direction:row;align-items:center;justify-content:space-between" data-l="${i}" ${open?'':'disabled'}><span><span class="nm" style="font-size:1.25rem">${i+1}단계 ${l.name}</span><br><span class="lv">${open?l.desc:'앞 단계를 마치면 열려요'}</span></span><span style="font-size:1.4rem;color:var(--sun)">${i<S.unlocked[k]?'★★':open?('★'.repeat(st)+'☆'.repeat(2-st)):'🔒'}</span></button>`}).join('');
+  $('lvList').innerHTML=L.map((l,i)=>{const open=i<=S.unlocked[k];const st=S.stars[k+i]||0;return`<button class="subj ${SUBJ[k].cls}" style="min-height:auto;flex-direction:row;align-items:center;justify-content:space-between" data-l="${i}" ${open?'':'disabled'}><span><span class="nm" style="font-size:1.25rem">${i+1}단계 ${l.name}</span><br><span class="lv">${open?`${l.desc} · <b>${l.area||''}</b>`:'앞 단계를 마치면 열려요'}</span></span><span style="font-size:1.4rem;color:var(--sun)">${i<S.unlocked[k]?'★★':open?('★'.repeat(st)+'☆'.repeat(2-st)):'🔒'}</span></button>`}).join('');
   $('lvList').onclick=e=>{const b=e.target.closest('[data-l]');if(b&&!b.disabled)startPractice(k,+b.dataset.l)};show('levels')}
 
 /* ================= session ================= */
 let P=null;
 function genSet(k,lv,n,rng){const prev=R;if(rng)R=rng;const out=[],keys=new Set();let tries=0;while(out.length<n&&tries<80){tries++;const q=LEVELS[k][lv].gen();if(keys.has(q.key)&&tries<60)continue;keys.add(q.key);out.push(q)}R=prev;return out}
-function buildQs(k,lv){const t=dkey();const due=S.review.filter(r=>r.subj===k&&r.due<=t).slice(0,2);const qs=genSet(k,lv,S.n-due.length).map(q=>({...q,subj:k,lv}));
+function buildQs(k,lv){const t=dkey();const due=S.review.filter(r=>r.subj===k&&(r.grade||1)===S.grade&&r.due<=t).slice(0,2);const qs=genSet(k,lv,S.n-due.length).map(q=>({...q,subj:k,lv}));
   due.forEach(r=>qs.splice(ri(0,qs.length),0,{...r.q,subj:k,lv:r.lv,reviewId:r.id}));return qs}
 $('startDaily').onclick=()=>{const t=dkey(),done=S.daily[t]||{};let queue=ORDER.filter(k=>!done[k]);if(!queue.length)queue=ORDER.slice();P={mode:'daily',queue,qi:0,results:[]};startSubject()};
 function startPractice(k,lv){P={mode:'practice',queue:[k],qi:0,results:[],fixedLv:lv};startSubject()}
@@ -535,25 +712,31 @@ function startSubject(){const k=P.queue[P.qi];const lv=P.fixedLv!=null?P.fixedLv
 function showQ(){const c=P.cur,q=c.qs[c.i];c.tries=0;c.locked=false;
   $('dots').innerHTML=c.qs.map((_,i)=>`<i class="${i<c.i?(c.first[i]?'ok':'no'):i===c.i?'now':''}"></i>`).join('');
   $('qVis').innerHTML=q.vis||'';$('qVis').hidden=!q.vis;$('qText').textContent=q.text;
-  const ch=$('qChoices');ch.className='choices'+(q.choices.length===3?' c3':'');
-  ch.innerHTML=q.choices.map(x=>`<button class="${q.big?'bigc':''}" data-a="${esc(x)}">${esc(x)}${q.labels&&q.labels[x]?`<small>${esc(q.labels[x])}</small>`:''}</button>`).join('');
+  const ch=$('qChoices');c.typed='';
+  if(q.input==='num'){ch.className='pad';ch.innerHTML=`<div class="numdisp" id="numDisp">?</div>`+[1,2,3,4,5,6,7,8,9].map(d=>`<button data-k="${d}">${d}</button>`).join('')+`<button data-k="del" class="padx">지우기</button><button data-k="0">0</button><button data-k="ok" class="padok">확인</button>`}
+  else{const long=q.choices.some(x=>String(x).length>7);ch.className='choices'+(q.choices.length===3&&!long?' c3':'')+(long?' long':'');
+  ch.innerHTML=q.choices.map(x=>`<button class="${q.big?'bigc':''}${long?' txt':''}" data-a="${esc(x)}">${esc(x)}${q.labels&&q.labels[x]?`<small>${esc(q.labels[x])}</small>`:''}</button>`).join('')}
   $('qFb').textContent='';$('qFb').className='fb';$('qNext').hidden=true;
   setTimeout(()=>speak(q.say,q.lang),250)}
 $('qSpeak').onclick=()=>{const q=P.cur.qs[P.cur.i];speak(q.say,q.lang)};
-$('qChoices').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.disabled||P.cur.locked)return;const c=P.cur,q=c.qs[c.i];const ok=b.dataset.a===q.ans;
-  if(c.tries===0)c.first[c.i]=ok;c.tries++;
-  if(ok){b.classList.add('right');c.locked=true;tone(true);$('qFb').className='fb ok';$('qFb').innerHTML=`<span class="pop">⭐</span> ${pick(['정답!','잘했어요!','최고예요!','맞았어요!'])}${q.reveal?` <span class="small muted">${esc(q.reveal)}</span>`:''}`;
-    if(q.sayAns)setTimeout(()=>speak(q.sayAns,q.ansLang||'ko'),300);finishQ(ok)}
-  else if(c.tries===1){b.classList.add('wrong');b.disabled=true;tone(false);$('qFb').className='fb no';$('qFb').textContent='한 번 더 생각해 볼까?';speak('한 번 더 생각해 볼까?')}
-  else{b.classList.add('wrong');c.locked=true;tone(false);$('qChoices').querySelectorAll('button').forEach(x=>{if(x.dataset.a===q.ans)x.classList.add('right')});$('qFb').className='fb no';$('qFb').textContent=`정답은 ${q.labels&&q.labels[q.ans]?q.labels[q.ans]:q.ans}! 다음엔 맞힐 수 있어요`;if(q.sayAns)speak(q.sayAns,q.ansLang||'ko');finishQ(false)}});
+$('qChoices').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.disabled||!P||P.cur.locked)return;const c=P.cur,q=c.qs[c.i];
+  if(q.input==='num'){padKey(b.dataset.k);return}judge(b.dataset.a===q.ans,b)});
+function padKey(k){const c=P.cur,q=c.qs[c.i],d=$('numDisp');if(!d||c.locked)return;if(k==='del')c.typed=c.typed.slice(0,-1);else if(k==='ok'){if(c.typed)judge(c.typed===q.ans,null);return}else if(c.typed.length<4)c.typed+=k;d.textContent=c.typed||'?'}
+addEventListener('keydown',e=>{if($('v-play').hidden||!P)return;const q=P.cur.qs[P.cur.i];if(q.input!=='num')return;if(/^[0-9]$/.test(e.key))padKey(e.key);else if(e.key==='Backspace')padKey('del');else if(e.key==='Enter')padKey('ok')});
+function judge(ok,b){const c=P.cur,q=c.qs[c.i],d=$('numDisp');if(c.tries===0)c.first[c.i]=ok;c.tries++;const nm=x=>q.labels&&q.labels[x]?q.labels[x]:x;
+  if(ok){b&&b.classList.add('right');d&&d.classList.add('right');c.locked=true;tone(true);$('qFb').className='fb ok';$('qFb').innerHTML=`<span class="pop">⭐</span> ${pick(['정답!','잘했어요!','최고예요!','맞았어요!'])}${q.reveal?` <span class="small muted">${esc(q.reveal)}</span>`:''}`;
+    if(q.sayAns)setTimeout(()=>speak(q.sayAns,q.ansLang||'ko'),300);finishQ()}
+  else if(c.tries===1){if(b){b.classList.add('wrong');b.disabled=true}if(d){d.classList.add('wrong');setTimeout(()=>{d.classList.remove('wrong');c.typed='';d.textContent='?'},700)}tone(false);$('qFb').className='fb no';$('qFb').textContent='한 번 더 생각해 볼까?';speak('한 번 더 생각해 볼까?')}
+  else{if(b)b.classList.add('wrong');c.locked=true;tone(false);$('qChoices').querySelectorAll('button[data-a]').forEach(x=>{if(x.dataset.a===q.ans)x.classList.add('right')});if(d){d.textContent=q.ans;d.classList.remove('wrong');d.classList.add('right')}
+    $('qFb').className='fb no';$('qFb').textContent=`정답은 ${nm(q.ans)}! 다음엔 맞힐 수 있어요`;if(q.sayAns)speak(q.sayAns,q.ansLang||'ko');finishQ()}}
 function finishQ(){const c=P.cur,q=c.qs[c.i],ok=c.first[c.i];
   if(q.reviewId){const r=S.review.find(x=>x.id===q.reviewId);if(r){if(ok){r.box++;if(r.box>=3)S.review=S.review.filter(x=>x!==r);else r.due=addDays(dkey(),3)}else{r.box=1;r.due=addDays(dkey(),1)}}}
-  else if(!ok){const {subj,lv,reviewId,...qq}=q;S.review.push({id:Date.now()+''+Math.random().toString(36).slice(2,6),subj:c.k,lv:c.lv,q:qq,box:1,due:addDays(dkey(),1)})}
+  else if(!ok){const {subj,lv,reviewId,...qq}=q;S.review.push({id:Date.now()+''+Math.random().toString(36).slice(2,6),subj:c.k,lv:c.lv,grade:S.grade,q:qq,box:1,due:addDays(dkey(),1)})}
   save();$('qNext').hidden=false;$('qNext').textContent=c.i===c.qs.length-1?'끝!':'다음'}
 $('qNext').onclick=()=>{const c=P.cur;c.i++;if(c.i<c.qs.length)showQ();else endSubject()};
 $('quitPlay').onclick=()=>{try{speechSynthesis.cancel()}catch(e){}show('home')};
 function endSubject(){const c=P.cur;const correct=c.first.filter(Boolean).length,n=c.qs.length;const acc=correct/n;
-  S.log.push({date:dkey(),subj:c.k,lv:c.lv,n,correct,secs:Math.round((Date.now()-c.start)/1000)});
+  S.log.push({date:dkey(),grade:S.grade,subj:c.k,lv:c.lv,n,correct,secs:Math.round((Date.now()-c.start)/1000)});
   let levelUp=false;const sk=c.k+c.lv;
   if(acc>=.8&&c.lv===S.unlocked[c.k]){S.stars[sk]=(S.stars[sk]||0)+1;if(S.stars[sk]>=2&&c.lv<LEVELS[c.k].length-1){S.unlocked[c.k]=c.lv+1;S.level[c.k]=c.lv+1;levelUp=true;S.stickers.push(STK[S.stickers.length%STK.length])}}
   if(P.mode==='practice'&&c.lv<=S.unlocked[c.k]&&!levelUp)S.level[c.k]=Math.max(S.level[c.k],0);
@@ -581,33 +764,36 @@ $('gateOk').onclick=()=>{if(+$('gateA').value===gateAns){$('gate').hidden=true;$
 $('gateA').addEventListener('keydown',e=>{if(e.key==='Enter')$('gateOk').click()});
 $('pTabs').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;$('pTabs').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));['report','print','plan','settings'].forEach(v=>$('p-'+v).hidden=v!==b.dataset.v);if(b.dataset.v==='print')makeSheet()});
 function renderParent(){
-  const since=addDays(dkey(),-6);const recent=S.log.filter(l=>l.date>=since);
+  const since=addDays(dkey(),-6);const recent=S.log.filter(l=>l.date>=since&&(l.grade||1)===S.grade);
   const mins=Math.round(recent.reduce((a,l)=>a+l.secs,0)/60);const days=new Set(recent.map(l=>l.date)).size;
   $('rpSummary').textContent=`${days}일 공부 · ${mins}분 · 연속 ${streak()}일`;
   $('rpBody').innerHTML=ORDER.map(k=>{const r=recent.filter(l=>l.subj===k);const n=r.reduce((a,l)=>a+l.n,0),c=r.reduce((a,l)=>a+l.correct,0);const acc=n?Math.round(c/n*100):null;
     const col=acc==null?'var(--muted)':acc>=80?'var(--good)':acc>=60?'var(--sun)':'var(--bad)';
     return`<tr><td style="color:${SUBJ[k].color};font-family:var(--f-display);font-size:1.1rem">${SUBJ[k].name}</td><td>${S.level[k]+1}/${LEVELS[k].length} ${LEVELS[k][S.level[k]].name}</td><td class="num">${n}</td><td class="num" style="color:${col}">${acc==null?'기록 없음':acc+'%'}</td><td><button class="lvbtn" data-adj="${k}" data-d="-1" aria-label="${SUBJ[k].name} 단계 내리기">−</button> <button class="lvbtn" data-adj="${k}" data-d="1" aria-label="${SUBJ[k].name} 단계 올리기">+</button></td></tr>`}).join('');
-  const t=dkey();$('rvBox').innerHTML=S.review.length?ORDER.map(k=>{const r=S.review.filter(x=>x.subj===k);if(!r.length)return'';return`<p><b style="color:${SUBJ[k].color};font-family:var(--f-display);font-weight:400">${SUBJ[k].name}</b> ${r.length}개 (오늘 복습 ${r.filter(x=>x.due<=t).length}개): ${r.slice(0,6).map(x=>esc(x.q.text+(x.q.reveal?' '+x.q.reveal:''))).join(', ')}${r.length>6?' …':''}</p>`}).join(''):'<p class="muted">비어 있어요. 틀린 문제가 생기면 여기 모입니다.</p>';
+  const t=dkey();$('rvBox').innerHTML=S.review.length?ORDER.map(k=>{const r=S.review.filter(x=>x.subj===k&&(x.grade||1)===S.grade);if(!r.length)return'';return`<p><b style="color:${SUBJ[k].color};font-family:var(--f-display);font-weight:400">${SUBJ[k].name}</b> ${r.length}개 (오늘 복습 ${r.filter(x=>x.due<=t).length}개): ${r.slice(0,6).map(x=>esc(x.q.text+(x.q.reveal?' '+x.q.reveal:''))).join(', ')}${r.length>6?' …':''}</p>`}).join(''):'<p class="muted">비어 있어요. 틀린 문제가 생기면 여기 모입니다.</p>';
   $('stName').value=S.name;$('stN').value=S.n;$('stVoice').value=S.voice;$('stBreak').value=S.brk;
-  $('planLevels').innerHTML=ORDER.map(k=>`<p><b style="color:${SUBJ[k].color}">${SUBJ[k].name}</b> ${LEVELS[k].map((l,i)=>`${i+1}. ${l.name}`).join(' → ')}</p>`).join('');
+  $('stGrade').value=S.grade;$('planGrade').textContent=`${S.grade}학년`;
+  $('planLevels').innerHTML=ORDER.map(k=>`<div><b style="color:${SUBJ[k].color};font-family:var(--f-display);font-weight:400;font-size:1.1rem">${SUBJ[k].name}</b><ol style="margin:4px 0 0;padding-left:22px">${LEVELS[k].map(l=>`<li>${l.name} <span class="muted">(${l.area||''})</span></li>`).join('')}</ol></div>`).join('');
   fillPrintSelect();
 }
 $('rpBody').addEventListener('click',e=>{const b=e.target.closest('[data-adj]');if(!b)return;const k=b.dataset.adj,d=+b.dataset.d;const nv=Math.min(LEVELS[k].length-1,Math.max(0,S.level[k]+d));S.level[k]=nv;S.unlocked[k]=Math.max(S.unlocked[k],nv);save();renderParent()});
+$('stGrade').onchange=e=>{setGrade(+e.target.value);$('prSubj').innerHTML='';renderParent()};
 $('stName').oninput=e=>{S.name=e.target.value.trim().slice(0,10);save()};
 $('stN').onchange=e=>{S.n=+e.target.value;save()};
 $('stVoice').onchange=e=>{S.voice=+e.target.value;save()};
 $('stBreak').onchange=e=>{S.brk=+e.target.value;save()};
 $('resetBtn').onclick=()=>$('resetYes').hidden=false;
-$('resetYes').onclick=()=>{const keep={name:S.name,n:S.n,voice:S.voice,brk:S.brk};S=Object.assign(blank(),keep);save();$('resetYes').hidden=true;renderParent()};
+$('resetYes').onclick=()=>{const keep={name:S.name,n:S.n,voice:S.voice,brk:S.brk};S=Object.assign(blank(),keep,{grade:S.grade});bindGrade();save();$('resetYes').hidden=true;renderParent()};
 
 /* ================= worksheets ================= */
 const CIRC=['①','②','③','④'];
-function sheetHTML(k,lv,n,seed,opts={}){const rng=mulberry(seed);const qs=genSet(k,lv,n,rng);const L=LEVELS[k][lv];const title=`${SUBJ[k].name} ${lv+1}단계 · ${L.name}`;
+function sheetHTML(k,lv,n,seed,opts={}){const rng=mulberry(seed);const qs=genSet(k,lv,n,rng);const L=LEVELS[k][lv];const title=`${S.grade}학년 ${SUBJ[k].name} ${lv+1}단계 · ${L.name}`;
   const isL=q=>q.lang==='en'&&/👂/.test(q.vis||'');
   const qh=qs.map((q,i)=>{const lab=x=>{const nm=(q.labels&&q.labels[x])||(!isL(q)&&q.printNames&&q.printNames[x]);return esc(x)+(nm?`<small> ${esc(nm)}</small>`:'')};
     const lis=isL(q)?`<div class="say">🔊 잘 듣고 골라요<br><small style="font-size:11px">(읽어 줄 말은 정답 쪽에 있어요)</small></div>`:'';
-    return`<div class="wq"><span class="n">${i+1}. ${esc(q.text)}</span><div class="wv vis">${lis||q.vis||''}</div><div class="wc">${q.choices.map((x,j)=>`<span>${CIRC[j]} ${lab(x)}</span>`).join('')}</div></div>`}).join('');
-  const key=qs.map((q,i)=>`<div>${i+1}. ${CIRC[q.choices.indexOf(q.ans)]} ${esc((q.labels&&q.labels[q.ans])||(q.printNames&&q.printNames[q.ans])||q.ans)}</div>`).join('');
+    const ans=q.input==='num'?'<span>답: (&emsp;&emsp;&emsp;&emsp;)</span>':q.choices.map((x,j)=>`<span>${CIRC[j]} ${lab(x)}</span>`).join('');
+    return`<div class="wq"><span class="n">${i+1}. ${esc(q.text)}</span><div class="wv vis">${lis||q.vis||''}</div><div class="wc">${ans}</div></div>`}).join('');
+  const key=qs.map((q,i)=>`<div>${i+1}. ${q.input==='num'?'':CIRC[q.choices.indexOf(q.ans)]} ${esc((q.labels&&q.labels[q.ans])||(q.printNames&&q.printNames[q.ans])||q.ans)}</div>`).join('');
   const readList=qs.some(isL)?`<h1 style="font-size:16px;margin-top:14px">어른이 읽어 줄 말</h1><div class="grid">${qs.map((q,i)=>isL(q)?`<div>${i+1}. “${esc(q.say)}”</div>`:'').join('')}</div>`:'';
   const meta=`<div class="meta"><span>이름: ________________</span><span>날짜: ____월 ____일</span><span>맞은 개수: ____ / ${n}</span></div>`;
   return`<div class="sheet"><h1>${title}</h1><p style="font-size:12px;margin:2px 0 6px">${esc(L.desc)} · 알맞은 답에 ○ 하세요.</p>${meta}<div class="grid">${qh}</div><div class="foot"><span>한걸음 공부방</span><span>${opts.page||''}</span></div></div>
@@ -619,7 +805,8 @@ function makeSheet(){const k=$('prSubj').value||'kor',lv=+$('prLevel').value||0,
 $('prMake').onclick=makeSheet;$('prLevel').onchange=makeSheet;$('prCount').onchange=makeSheet;
 $('prPrint').onclick=()=>{$('printRoot').innerHTML=lastSheet;try{window.print()}catch(e){}};
 /* PDF 묶음 생성용 (headless) */
-window.renderPack=function(k,seed=7){document.body.classList.add('printmode');$('printRoot').innerHTML=LEVELS[k].map((_,i)=>sheetHTML(k,i,10,seed*100+i,{page:`${i+1}/${LEVELS[k].length}단계`})).join('')};
+window.fitSheets=function(){document.querySelectorAll('#printRoot .sheet').forEach(sh=>{const g=sh.querySelector('.grid');let z=1;while(sh.scrollHeight>sh.clientHeight+2&&z>0.55){z-=0.04;g.style.zoom=z}})};
+window.renderPack=function(k,seed=7,grade=2){setGrade(grade);document.body.classList.add('printmode');$('printRoot').innerHTML=LEVELS[k].map((_,i)=>sheetHTML(k,i,10,seed*100+i,{page:`${i+1}/${LEVELS[k].length}단계`})).join('')};
 window.renderLog=function(){document.body.classList.add('printmode');const days=['월','화','수','목','금','토','일'];
   const rows=days.map(d=>`<tr><td style="font-family:var(--f-display);font-size:18px">${d}</td>${ORDER.map(()=>'<td style="text-align:center;font-size:26px">○</td>').join('')}<td></td><td style="text-align:center;font-size:26px">☆</td></tr>`).join('');
   $('printRoot').innerHTML=`<div class="sheet"><h1>주간 공부 기록표</h1><div class="meta"><span>이름: ________________</span><span>____월 ____일 ~ ____월 ____일</span></div>
