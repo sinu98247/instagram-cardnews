@@ -208,6 +208,45 @@ body.printmode .sheet{border:0;border-radius:0;max-width:none;width:210mm;height
 .sheet .shape{fill:#fff;stroke:#111}
 .sheet .wq .wv .big{font-size:26px!important}.sheet .wq .wv .formula{font-size:22px!important}.sheet .wq .wv .say{font-size:16px!important}.sheet .wq .wv .emo-row{font-size:22px!important}.sheet .wq .wv .grp{font-size:13px!important}
 
+/* 배우기·3D·3~6학년 */
+.lvrow{flex-direction:row!important;align-items:center;gap:12px;min-height:auto!important;flex-wrap:wrap}
+.lvbtns{display:flex;gap:8px;flex-wrap:wrap}.lvbtns button{min-height:48px;font-size:1rem;padding:8px 14px}.lvbtns .go{min-height:48px;font-size:1rem}
+.lstage{min-height:340px;align-items:center;justify-content:center;text-align:center;overflow:hidden}
+.lscap{font-family:var(--f-display);font-size:1.25rem;text-align:center;min-height:2.6em;margin:0}
+.sc-intro{border-radius:18px;padding:28px 18px;display:flex;flex-direction:column;align-items:center;gap:10px;width:100%}
+.sc-row{display:flex;align-items:center;justify-content:center;gap:10px}
+.sc-tile{font-family:var(--f-display);font-size:4.5rem;background:var(--surface);border:3px solid var(--line);border-radius:18px;padding:4px 22px;transition:transform 1s ease,margin .6s ease,opacity .5s}
+.sc-tile.en{font-family:var(--f-body);font-weight:700;padding:4px 14px}
+.sc-plus{font-size:3rem;transition:opacity .5s}
+.sc-result{font-family:var(--f-display);font-size:6rem;opacity:0;transform:scale(.5);transition:all .6s;color:var(--kor)}.sc-result.on{opacity:1;transform:none}
+.sc-emo{font-size:4rem;transition:opacity .5s}
+.sc-emo-grid{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;font-size:2.4rem;max-width:420px;min-height:60px}
+.sc-big{font-family:var(--f-display);font-size:2rem;margin-top:8px}
+.sc-pop{animation:pop .45s ease-out}
+.scn{width:min(520px,100%);height:auto}.sc-axis{stroke:var(--ink);stroke-width:2}.sc-txt{fill:var(--ink);font-family:var(--f-display);font-size:14px}.sc-acc{fill:var(--kor)}
+.sc-arc{fill:none;stroke:var(--kor);stroke-width:3;transition:stroke-dashoffset .7s ease}.sc-dot{fill:var(--sun);transition:cx .6s ease}
+.sc-plate{min-width:84px;min-height:84px;border:3px solid var(--line);border-radius:50%;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;font-size:1.5rem;padding:8px;background:var(--surface)}
+.sc-place{border-collapse:collapse;font-family:var(--f-display)}.sc-place th{font-weight:400;font-size:1rem;color:var(--muted);padding:4px 14px}.sc-place td{border:3px solid var(--line);width:80px;height:84px;text-align:center;font-size:3rem}
+.sc-drop{display:inline-block;opacity:0;transform:translateY(-40px);transition:all .5s}.sc-drop.on{opacity:1;transform:none}
+.sc-cell{fill:var(--surface);stroke:var(--line);transition:fill .3s}.sc-cell.on{fill:var(--math-soft);stroke:var(--math)}
+.sc-cycle{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center}.sc-step{display:flex;flex-direction:column;align-items:center;font-family:var(--f-display);font-size:1.05rem;transition:opacity .5s}.sc-step b{font-size:3rem;font-weight:400}.sc-arrow{font-size:1.8rem;color:var(--muted);transition:opacity .5s}
+.sc-ex button[disabled]{opacity:1}
+.sc-ex{display:flex;flex-direction:column;gap:12px;width:100%;align-items:center}.sc-ex .choices{width:100%}
+.sc-layers{display:flex;flex-direction:column-reverse;width:240px;border:3px solid var(--ink);border-radius:8px;overflow:hidden}.sc-layers i{height:34px}
+.d3stage{width:100%;min-height:300px;display:flex;align-items:center;justify-content:center;border-radius:14px;background:radial-gradient(circle at 50% 40%,var(--surface),var(--bg))}
+.d3stage canvas{display:block;max-width:100%;border-radius:14px}
+.d3ctl button{min-height:48px;font-size:1rem}.d3ctl button[aria-pressed="true"]{background:var(--math);color:#fff;border-color:var(--math)}
+.frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1.05;margin:0 .12em}.frac i{font-style:normal}.frac i:first-child{border-bottom:.08em solid currentColor;padding:0 .15em}
+.fsvg{width:160px;height:auto}.vis.svgr .fsvg{width:min(320px,100%)}.fon{fill:var(--math);stroke:var(--surface);stroke-width:2}.foff{fill:var(--math-soft);stroke:var(--math);stroke-width:1.5}
+.asvg{width:min(320px,100%)}.aray{stroke:var(--ink);stroke-width:3;stroke-linecap:round}.aarc{fill:none;stroke:var(--kor);stroke-width:2.5}.atxt{fill:var(--kor);font-family:var(--f-display);font-size:20px}.adot{fill:var(--ink)}
+.csvg{width:min(380px,100%)}.cgrid{stroke:var(--line)}.ctxt{fill:var(--muted);font-size:10px;font-family:var(--f-body)}.cline{fill:none;stroke:var(--math);stroke-width:2.5}.cdot{fill:var(--math)}.cpie{stroke:var(--surface);stroke-width:2}
+.rsvg{width:min(320px,100%)}.dash{stroke:var(--kor);stroke-dasharray:4 3;stroke-width:1.5}
+.tgrid{border-collapse:collapse;margin:6px auto;font-family:var(--f-display)}.tgrid td{width:56px;height:56px;border:3px solid var(--math);text-align:center;font-size:1.8rem;background:var(--math-soft)}
+.pg td{font-size:1.3rem;padding:4px 10px}
+.sheet .fsvg{width:80px}.sheet .vis.svgr .fsvg{width:200px}.sheet .fon{fill:#666;stroke:#fff}.sheet .foff{fill:#fff;stroke:#333}
+.sheet .asvg,.sheet .csvg,.sheet .rsvg{width:200px}.sheet .aray{stroke:#111}.sheet .aarc{stroke:#333}.sheet .atxt{fill:#111;font-size:16px}.sheet .adot{fill:#111}
+.sheet .cgrid{stroke:#ccc}.sheet .ctxt{fill:#333}.sheet .cline{stroke:#111}.sheet .cdot{fill:#111}.sheet .dash{stroke:#555}
+.sheet .tgrid td{width:26px;height:26px;font-size:14px;border:1.5px solid #333;background:#fff}.sheet .pg td{font-size:12px;padding:1px 6px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
@@ -243,6 +282,29 @@ body.printmode .sheet{border:0;border-radius:0;max-width:none;width:210mm;height
     <div class="top"><button class="quiet" data-home>← 처음으로</button><span class="tag" id="lvTag"></span></div>
     <h1 id="lvTitle"></h1>
     <div class="stack" id="lvList"></div>
+  </section>
+
+  <!-- LEARN -->
+  <section id="v-learn" class="stack" hidden>
+    <div class="top"><button class="quiet" id="lsClose">← 나가기</button><div class="dots" id="lsBar"></div><span class="tag" id="lsTag"></span></div>
+    <h1 id="lsTitle"></h1>
+    <div class="card lstage" id="lsStage"></div>
+    <div class="card center" id="lsEnd" hidden>
+      <div class="huge">🎬</div><h2>영상 끝! 이제 직접 풀어 봐요</h2>
+      <div class="row" style="justify-content:center"><button class="go" id="lsSolve">문제 풀기</button><button id="ls3d">3D로 보기</button><button class="quiet" id="lsAgain">다시 보기</button></div>
+      <a class="small" id="lsVideo" target="_blank" rel="noopener" href="#">관련 영상 더 찾아보기 (부모님과 함께, YouTube)</a>
+    </div>
+    <p class="lscap" id="lsCap"></p>
+    <div class="row" style="justify-content:center"><button class="quiet" id="lsPrev">◀ 이전</button><button id="lsPlay">일시정지</button><button class="quiet" id="lsNext">다음 ▶</button></div>
+  </section>
+
+  <!-- 3D -->
+  <section id="v-d3" class="stack" hidden>
+    <div class="top"><button class="quiet" id="d3Back">← 돌아가기</button><span class="tag" style="background:var(--math-soft);color:var(--math)">3D</span></div>
+    <h1 id="d3Title">3D</h1>
+    <div class="card" style="padding:8px"><div id="d3Stage" class="d3stage"></div><p class="small muted" id="d3Hint" style="text-align:center"></p></div>
+    <div class="ptab d3ctl" id="d3Ctl"></div>
+    <p class="card" id="d3Info"></p>
   </section>
 
   <!-- PLAY -->
@@ -329,13 +391,14 @@ body.printmode .sheet{border:0;border-radius:0;max-width:none;width:210mm;height
 
       <div id="p-plan" class="stack why" hidden>
         <div class="card">
-          <h3>하루 루틴 (2학년 약 20분, 1학년 약 15분)</h3>
+          <h3>하루 루틴 (1학년 15분 · 2학년 20분 · 3~4학년 25분 · 5~6학년 30분)</h3>
           <p>국어 → 몸 깨우기 → 수학 → 몸 깨우기 → 영어 → 몸 깨우기 → 과학. 과목당 5문제입니다. 2학년 수학은 보기를 고르지 않고 숫자 패드로 직접 답을 입력합니다. 고르는 것보다 스스로 떠올리는 것이 더 강한 연습이기 때문입니다.</p>
           <p>권장: 평일 매일 태블릿 20분 + 주말에 학습지 1~2장. 학습 현황에서 정답률이 낮은 단계를 골라 학습지로 뽑으세요.</p>
         </div>
         <div class="card stack">
           <h3>교육과정 기준</h3>
-          <p>현재 초등학교 전 학년에 적용되는 <b>2022 개정 교육과정</b>을 따랐습니다.</p>
+          <p>현재 초등학교 전 학년에 적용되는 <b>2022 개정 교육과정</b>을 따랐습니다. 1~6학년, 국어·수학·영어·과학 전 과정이 들어 있습니다. 3~6학년은 교육과정의 학년군(3~4학년군, 5~6학년군) 성취기준을 바탕으로 학년별 단계를 나눴고, 실제 단원 배치는 학교 교과서마다 다를 수 있습니다.</p>
+          <p><b>배우기(그림 영상)</b> 처음 보는 단계에서는 문제를 풀기 전에 그림 영상이 먼저 나옵니다. 그림 영상은 내레이션과 움직이는 그림으로 개념을 설명하고, 예제 두 개를 함께 풉니다. 입체도형, 전개도, 쌓기나무, 지구와 달, 태양계, 물의 상태 변화, 지층은 <b>3D</b>로 돌려 볼 수 있습니다.</p>
           <p><b>국어</b> 1~2학년군 영역(듣기·말하기, 읽기, 쓰기, 문법, 문학, 매체) 가운데 한글 해득, 소리와 표기가 다른 낱말, 문장 부호, 흉내 내는 말, 높임 표현, 글의 내용 확인을 다룹니다.</p>
           <p><b>수학</b> 네 영역(수와 연산, 변화와 관계, 도형과 측정, 자료와 가능성)에 맞췄습니다. 2학년은 세 자리 수, 받아올림·받아내림, 곱셈구구, 길이(cm·m), 시각과 시간, 규칙과 표, 여러 가지 도형입니다.</p>
           <p><b>영어</b>는 3학년부터 정규 과목입니다. 그래서 2학년 과정은 3학년 수업을 미리 준비하도록 알파벳, 단모음 파닉스, 생활 낱말, 인사 표현, 짧은 문장으로 짰습니다.</p>
@@ -358,7 +421,7 @@ body.printmode .sheet{border:0;border-radius:0;max-width:none;width:210mm;height
 
       <div id="p-settings" class="stack" hidden>
         <div class="card">
-          <div class="set"><span>학년</span><select id="stGrade"><option value="1">1학년</option><option value="2">2학년</option></select></div>
+          <div class="set"><span>학년</span><select id="stGrade"><option value="1">1학년</option><option value="2">2학년</option><option value="3">3학년</option><option value="4">4학년</option><option value="5">5학년</option><option value="6">6학년</option></select></div>
           <div class="set"><span>아이 이름</span><input type="text" id="stName" placeholder="예: 민준" style="font:inherit;padding:8px 10px;border-radius:10px;border:2px solid var(--line);background:var(--bg);color:var(--ink);width:160px"></div>
           <div class="set"><span>과목당 문제 수</span><select id="stN"><option value="3">3문제</option><option value="5">5문제</option><option value="7">7문제</option></select></div>
           <div class="set"><span>문제 읽어주기</span><select id="stVoice"><option value="1">켜기</option><option value="0">끄기</option></select></div>
@@ -651,9 +714,12 @@ sci:[
  {name:'빛과 소리',area:'3학년 과학 준비',desc:'그림자, 떨림, 소리의 크기',gen:qaGen(S2_LIGHT)},
  {name:'마을과 세계',area:'통합교과 · 마을 · 세계',desc:'마을 사람들의 일, 여러 나라',gen:qaGen(S2_TOWN)},
 ]};
-const AREA1={kor:['한글 해득','한글 해득','한글 해득','한글 해득','읽기','읽기','읽기 · 쓰기'],math:['수와 연산','수와 연산','수와 연산','수와 연산','수와 연산','도형과 측정','수와 연산'],eng:['알파벳','알파벳','파닉스','듣기','어휘','어휘'],sci:['통합교과','통합교과','통합교과 · 계절','통합교과 · 나','탐구 놀이','탐구 놀이','통합교과 · 계절','통합교과 · 자연']};
+LEVELS1.math.push({name:'여러 가지 모양',desc:'상자, 둥근기둥, 공 모양',d3:'solids1',gen:qaGen([['📦','평평한 면만 있는 모양은?','상자 모양',['둥근기둥 모양','공 모양']],['⚽','어느 쪽으로도 잘 굴러가는 모양은?','공 모양',['상자 모양','둥근기둥 모양']],['🥫','눕히면 굴러가고 세우면 쌓을 수 있는 모양은?','둥근기둥 모양',['공 모양','상자 모양']],['🎁','선물 상자는 어떤 모양일까요?','상자 모양',['공 모양','둥근기둥 모양']],['🥁','북은 어떤 모양일까요?','둥근기둥 모양',['상자 모양','공 모양']],['🏀','농구공은 어떤 모양일까요?','공 모양',['상자 모양','둥근기둥 모양']],['🧱','높이 쌓기 가장 좋은 모양은?','상자 모양',['공 모양','둥근기둥 모양']]])});
+LEVELS2.math[9].d3='stack';
+const AREA1={kor:['한글 해득','한글 해득','한글 해득','한글 해득','읽기','읽기','읽기 · 쓰기'],math:['수와 연산','수와 연산','수와 연산','수와 연산','수와 연산','도형과 측정','수와 연산','도형과 측정'],eng:['알파벳','알파벳','파닉스','듣기','어휘','어휘'],sci:['통합교과','통합교과','통합교과 · 계절','통합교과 · 나','탐구 놀이','탐구 놀이','통합교과 · 계절','통합교과 · 자연']};
 Object.keys(AREA1).forEach(k=>LEVELS1[k].forEach((l,i)=>l.area=AREA1[k][i]));
 let LEVELS=LEVELS1;
+const GRADES={1:LEVELS1,2:LEVELS2};
 
 const SUBJ={kor:{name:'국어',cls:'s-kor',color:'var(--kor)',soft:'var(--kor-soft)'},math:{name:'수학',cls:'s-math',color:'var(--math)',soft:'var(--math-soft)'},eng:{name:'영어',cls:'s-eng',color:'var(--eng)',soft:'var(--eng-soft)'},sci:{name:'과학',cls:'s-sci',color:'var(--sci)',soft:'var(--sci-soft)'}};
 const ORDER=['kor','math','eng','sci'];
@@ -661,12 +727,11 @@ const ORDER=['kor','math','eng','sci'];
 /* ================= state ================= */
 const KEY='hangeoreum.v1';
 const fresh=()=>({level:{kor:0,math:0,eng:0,sci:0},unlocked:{kor:0,math:0,eng:0,sci:0},stars:{}});
-const blank=()=>({name:'',n:5,voice:1,brk:1,grade:2,prog:{1:fresh(),2:fresh()},log:[],review:[],stickers:[],daily:{}});
+const blank=()=>({name:'',n:5,voice:1,brk:1,grade:2,learned:{},prog:{1:fresh(),2:fresh(),3:fresh(),4:fresh(),5:fresh(),6:fresh()},log:[],review:[],stickers:[],daily:{}});
 let S=blank();
 try{const r=localStorage.getItem(KEY);if(r){const old=JSON.parse(r);S=Object.assign(blank(),old);if(!old.prog&&old.level){S.prog={1:{level:old.level,unlocked:old.unlocked,stars:old.stars||{}},2:fresh()};S.grade=2}}}catch(e){}
-function bindGrade(){const g=S.grade===1?1:2;S.grade=g;S.prog[g]=S.prog[g]||fresh();const p=S.prog[g];['kor','math','eng','sci'].forEach(k=>{p.level[k]=p.level[k]||0;p.unlocked[k]=p.unlocked[k]||0});S.level=p.level;S.unlocked=p.unlocked;S.stars=p.stars;LEVELS=g===1?LEVELS1:LEVELS2}
+function bindGrade(){let g=+S.grade;if(!GRADES[g])g=2;S.grade=g;S.prog[g]=S.prog[g]||fresh();const p=S.prog[g];['kor','math','eng','sci'].forEach(k=>{p.level[k]=p.level[k]||0;p.unlocked[k]=p.unlocked[k]||0});S.level=p.level;S.unlocked=p.unlocked;S.stars=p.stars;LEVELS=GRADES[g]}
 function setGrade(g){S.grade=g;bindGrade();save()}
-bindGrade();
 function save(){try{const {level,unlocked,stars,...rest}=S;localStorage.setItem(KEY,JSON.stringify(rest))}catch(e){}}
 const STK=['🦖','🚀','🦕','🚒','🐯','🏆','🚓','🛸','🐳','🦈','⚡','🌈','🎯','🪐','🐉','🏎️','🦁','🌋','🤖','🛩️'];
 
@@ -677,9 +742,9 @@ function speak(t,lang='ko'){if(!S.voice||!t)return;try{speechSynthesis.cancel();
 let actx;function tone(ok){try{actx=actx||new(window.AudioContext||window.webkitAudioContext)();const notes=ok?[523,659,784]:[330,262];notes.forEach((f,i)=>{const o=actx.createOscillator(),g=actx.createGain(),t=actx.currentTime+i*.11;o.type='triangle';o.frequency.value=f;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.18,t+.02);g.gain.exponentialRampToValueAtTime(.0001,t+.3);o.connect(g).connect(actx.destination);o.start(t);o.stop(t+.32)})}catch(e){}}
 
 /* ================= views ================= */
-const VIEWS=['home','levels','play','break','done','parent'];
-function show(v){VIEWS.forEach(x=>$('v-'+x).hidden=x!==v);window.scrollTo(0,0);if(v==='home')renderHome()}
-document.querySelectorAll('[data-home]').forEach(b=>b.onclick=()=>{try{speechSynthesis.cancel()}catch(e){}clearInterval(brT);show('home')});
+const VIEWS=['home','levels','play','break','done','parent','learn','d3'];let curView='home',prevView='home';
+function show(v){if(v!==curView){prevView=curView;curView=v}if(v!=='d3'&&typeof close3D==='function'&&window.THREE)close3D();VIEWS.forEach(x=>$('v-'+x).hidden=x!==v);window.scrollTo(0,0);if(v==='home')renderHome()}
+document.querySelectorAll('[data-home]').forEach(b=>b.onclick=()=>{try{speechSynthesis.cancel()}catch(e){}clearInterval(brT);if(typeof closeLesson==='function')closeLesson();show('home')});
 
 function streak(){const days=new Set(S.log.map(l=>l.date));let n=0;const d=new Date();if(!days.has(dkey(d)))d.setDate(d.getDate()-1);while(days.has(dkey(d))){n++;d.setDate(d.getDate()-1)}return n}
 function renderHome(){
@@ -689,7 +754,7 @@ function renderHome(){
   $('todaySteps').innerHTML=ORDER.map(k=>`<div class="step ${done[k]?'done':''}" style="${done[k]?`background:${SUBJ[k].soft};border-color:${SUBJ[k].color}`:''}"><b>${done[k]?'✔':'·'}</b>${SUBJ[k].name}</div>`).join('');
   const all=ORDER.every(k=>done[k]);
   $('startDaily').textContent=all?'오늘 공부 완료! 한 번 더 하기':(Object.keys(done).length?'이어서 하기':'오늘의 공부 시작');
-  $('todayHint').textContent=all?'오늘 몫을 다 했어요. 더 하고 싶으면 아래에서 골라 연습해요.':`네 과목을 ${S.n}문제씩, ${S.grade===1?15:20}분이면 끝나요.`;
+  $('todayHint').textContent=all?'오늘 몫을 다 했어요. 더 하고 싶으면 아래에서 골라 연습해요.':`네 과목을 ${S.n}문제씩, ${[0,15,20,25,25,30,30][S.grade]}분이면 끝나요. 처음 보는 단계는 그림 영상부터!`;
   $('subjTiles').innerHTML=ORDER.map(k=>{const L=LEVELS[k],lv=S.level[k];return`<button class="subj ${SUBJ[k].cls}" data-s="${k}"><span class="nm">${SUBJ[k].name}</span><span class="lv">${lv+1}단계 · ${L[lv].name}</span><span class="bar"><i style="width:${Math.round((S.unlocked[k]+((S.stars[k+S.unlocked[k]]||0)/2))/L.length*100)}%"></i></span></button>`}).join('');
   $('stkCount').textContent=`${S.stickers.length}개`;
   const slots=Math.max(20,Math.ceil((S.stickers.length+1)/10)*10);
@@ -697,8 +762,8 @@ function renderHome(){
 }
 $('subjTiles').addEventListener('click',e=>{const b=e.target.closest('[data-s]');if(b)openLevels(b.dataset.s)});
 function openLevels(k){const L=LEVELS[k];$('lvTag').textContent=SUBJ[k].name;$('lvTag').style.background=SUBJ[k].soft;$('lvTitle').textContent=`${SUBJ[k].name} 단계 고르기`;
-  $('lvList').innerHTML=L.map((l,i)=>{const open=i<=S.unlocked[k];const st=S.stars[k+i]||0;return`<button class="subj ${SUBJ[k].cls}" style="min-height:auto;flex-direction:row;align-items:center;justify-content:space-between" data-l="${i}" ${open?'':'disabled'}><span><span class="nm" style="font-size:1.25rem">${i+1}단계 ${l.name}</span><br><span class="lv">${open?`${l.desc} · <b>${l.area||''}</b>`:'앞 단계를 마치면 열려요'}</span></span><span style="font-size:1.4rem;color:var(--sun)">${i<S.unlocked[k]?'★★':open?('★'.repeat(st)+'☆'.repeat(2-st)):'🔒'}</span></button>`}).join('');
-  $('lvList').onclick=e=>{const b=e.target.closest('[data-l]');if(b&&!b.disabled)startPractice(k,+b.dataset.l)};show('levels')}
+  $('lvList').innerHTML=L.map((l,i)=>{const open=i<=S.unlocked[k];const st=S.stars[k+i]||0;const seen=(S.learned||{})[`${S.grade}.${k}.${i}`];return`<div class="subj lvrow ${SUBJ[k].cls}" ${open?'':'style="opacity:.55"'}><div style="flex:1;min-width:0"><span class="nm" style="font-size:1.25rem">${i+1}단계 ${l.name}</span> <span style="color:var(--sun)">${i<S.unlocked[k]?'★★':open?('★'.repeat(st)+'☆'.repeat(2-st)):'🔒'}</span><br><span class="lv">${open?`${l.desc} · <b>${l.area||''}</b>`:'앞 단계를 마치면 열려요'}</span></div>${open?`<div class="lvbtns"><button data-learn="${i}">${seen?'다시 배우기':'배우기'}</button><button class="go" data-l="${i}">문제 풀기</button>${l.d3?`<button data-d3="${l.d3}">3D</button>`:''}</div>`:''}</div>`}).join('');
+  $('lvList').onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.l)startPractice(k,+b.dataset.l,true);else if(b.dataset.learn)openLesson(k,+b.dataset.learn,()=>startPractice(k,+b.dataset.learn,true));else if(b.dataset.d3)open3D(b.dataset.d3)};show('levels')}
 
 /* ================= session ================= */
 let P=null;
@@ -706,29 +771,30 @@ function genSet(k,lv,n,rng){const prev=R;if(rng)R=rng;const out=[],keys=new Set(
 function buildQs(k,lv){const t=dkey();const due=S.review.filter(r=>r.subj===k&&(r.grade||1)===S.grade&&r.due<=t).slice(0,2);const qs=genSet(k,lv,S.n-due.length).map(q=>({...q,subj:k,lv}));
   due.forEach(r=>qs.splice(ri(0,qs.length),0,{...r.q,subj:k,lv:r.lv,reviewId:r.id}));return qs}
 $('startDaily').onclick=()=>{const t=dkey(),done=S.daily[t]||{};let queue=ORDER.filter(k=>!done[k]);if(!queue.length)queue=ORDER.slice();P={mode:'daily',queue,qi:0,results:[]};startSubject()};
-function startPractice(k,lv){P={mode:'practice',queue:[k],qi:0,results:[],fixedLv:lv};startSubject()}
-function startSubject(){const k=P.queue[P.qi];const lv=P.fixedLv!=null?P.fixedLv:S.level[k];P.cur={k,lv,qs:buildQs(k,lv),i:0,first:[],start:Date.now()};
+function startPractice(k,lv,skip){P={mode:'practice',queue:[k],qi:0,results:[],fixedLv:lv,skipLearn:!!skip};startSubject()}
+function startSubject(force){const k=P.queue[P.qi];const lv=P.fixedLv!=null?P.fixedLv:S.level[k];
+  if(!force&&!P.skipLearn&&!(S.learned||{})[`${S.grade}.${k}.${lv}`]){openLesson(k,lv,()=>startSubject(true));return}P.cur={k,lv,qs:buildQs(k,lv),i:0,first:[],start:Date.now()};
   $('playTag').textContent=`${SUBJ[k].name} ${lv+1}단계`;$('playTag').style.background=SUBJ[k].soft;$('playTag').style.color=SUBJ[k].color;show('play');showQ()}
 function showQ(){const c=P.cur,q=c.qs[c.i];c.tries=0;c.locked=false;
   $('dots').innerHTML=c.qs.map((_,i)=>`<i class="${i<c.i?(c.first[i]?'ok':'no'):i===c.i?'now':''}"></i>`).join('');
   $('qVis').innerHTML=q.vis||'';$('qVis').hidden=!q.vis;$('qText').textContent=q.text;
   const ch=$('qChoices');c.typed='';
-  if(q.input==='num'){ch.className='pad';ch.innerHTML=`<div class="numdisp" id="numDisp">?</div>`+[1,2,3,4,5,6,7,8,9].map(d=>`<button data-k="${d}">${d}</button>`).join('')+`<button data-k="del" class="padx">지우기</button><button data-k="0">0</button><button data-k="ok" class="padok">확인</button>`}
+  if(q.input==='num'){ch.className='pad';ch.innerHTML=`<div class="numdisp" id="numDisp">?</div>`+[1,2,3,4,5,6,7,8,9].map(d=>`<button data-k="${d}">${d}</button>`).join('')+(q.dec?`<button data-k="del" class="padx">지우기</button><button data-k="0">0</button><button data-k=".">.</button><button data-k="ok" class="padok" style="grid-column:1/-1">확인</button>`:`<button data-k="del" class="padx">지우기</button><button data-k="0">0</button><button data-k="ok" class="padok">확인</button>`)}
   else{const long=q.choices.some(x=>String(x).length>7);ch.className='choices'+(q.choices.length===3&&!long?' c3':'')+(long?' long':'');
-  ch.innerHTML=q.choices.map(x=>`<button class="${q.big?'bigc':''}${long?' txt':''}" data-a="${esc(x)}">${esc(x)}${q.labels&&q.labels[x]?`<small>${esc(q.labels[x])}</small>`:''}</button>`).join('')}
+  ch.innerHTML=q.choices.map(x=>`<button class="${q.big?'bigc':''}${long?' txt':''}" data-a="${esc(x)}">${fmtMath(esc(x))}${q.labels&&q.labels[x]?`<small>${esc(q.labels[x])}</small>`:''}</button>`).join('')}
   $('qFb').textContent='';$('qFb').className='fb';$('qNext').hidden=true;
   setTimeout(()=>speak(q.say,q.lang),250)}
 $('qSpeak').onclick=()=>{const q=P.cur.qs[P.cur.i];speak(q.say,q.lang)};
 $('qChoices').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.disabled||!P||P.cur.locked)return;const c=P.cur,q=c.qs[c.i];
   if(q.input==='num'){padKey(b.dataset.k);return}judge(b.dataset.a===q.ans,b)});
-function padKey(k){const c=P.cur,q=c.qs[c.i],d=$('numDisp');if(!d||c.locked)return;if(k==='del')c.typed=c.typed.slice(0,-1);else if(k==='ok'){if(c.typed)judge(c.typed===q.ans,null);return}else if(c.typed.length<4)c.typed+=k;d.textContent=c.typed||'?'}
-addEventListener('keydown',e=>{if($('v-play').hidden||!P)return;const q=P.cur.qs[P.cur.i];if(q.input!=='num')return;if(/^[0-9]$/.test(e.key))padKey(e.key);else if(e.key==='Backspace')padKey('del');else if(e.key==='Enter')padKey('ok')});
+function padKey(k){const c=P.cur,q=c.qs[c.i],d=$('numDisp');if(!d||c.locked)return;if(k==='del')c.typed=c.typed.slice(0,-1);else if(k==='ok'){if(c.typed)judge(c.typed===q.ans,null);return}else if(k==='.'){if(!c.typed.includes('.'))c.typed=(c.typed||'0')+'.'}else if(c.typed.length<7)c.typed+=k;d.textContent=c.typed||'?'}
+addEventListener('keydown',e=>{if($('v-play').hidden||!P)return;const q=P.cur.qs[P.cur.i];if(q.input!=='num')return;if(/^[0-9.]$/.test(e.key))padKey(e.key);else if(e.key==='Backspace')padKey('del');else if(e.key==='Enter')padKey('ok')});
 function judge(ok,b){const c=P.cur,q=c.qs[c.i],d=$('numDisp');if(c.tries===0)c.first[c.i]=ok;c.tries++;const nm=x=>q.labels&&q.labels[x]?q.labels[x]:x;
   if(ok){b&&b.classList.add('right');d&&d.classList.add('right');c.locked=true;tone(true);$('qFb').className='fb ok';$('qFb').innerHTML=`<span class="pop">⭐</span> ${pick(['정답!','잘했어요!','최고예요!','맞았어요!'])}${q.reveal?` <span class="small muted">${esc(q.reveal)}</span>`:''}`;
     if(q.sayAns)setTimeout(()=>speak(q.sayAns,q.ansLang||'ko'),300);finishQ()}
   else if(c.tries===1){if(b){b.classList.add('wrong');b.disabled=true}if(d){d.classList.add('wrong');setTimeout(()=>{d.classList.remove('wrong');c.typed='';d.textContent='?'},700)}tone(false);$('qFb').className='fb no';$('qFb').textContent='한 번 더 생각해 볼까?';speak('한 번 더 생각해 볼까?')}
   else{if(b)b.classList.add('wrong');c.locked=true;tone(false);$('qChoices').querySelectorAll('button[data-a]').forEach(x=>{if(x.dataset.a===q.ans)x.classList.add('right')});if(d){d.textContent=q.ans;d.classList.remove('wrong');d.classList.add('right')}
-    $('qFb').className='fb no';$('qFb').textContent=`정답은 ${nm(q.ans)}! 다음엔 맞힐 수 있어요`;if(q.sayAns)speak(q.sayAns,q.ansLang||'ko');finishQ()}}
+    $('qFb').className='fb no';$('qFb').innerHTML=`정답은 ${fmtMath(esc(nm(q.ans)))}! 다음엔 맞힐 수 있어요`;if(q.sayAns)speak(q.sayAns,q.ansLang||'ko');finishQ()}}
 function finishQ(){const c=P.cur,q=c.qs[c.i],ok=c.first[c.i];
   if(q.reviewId){const r=S.review.find(x=>x.id===q.reviewId);if(r){if(ok){r.box++;if(r.box>=3)S.review=S.review.filter(x=>x!==r);else r.due=addDays(dkey(),3)}else{r.box=1;r.due=addDays(dkey(),1)}}}
   else if(!ok){const {subj,lv,reviewId,...qq}=q;S.review.push({id:Date.now()+''+Math.random().toString(36).slice(2,6),subj:c.k,lv:c.lv,grade:S.grade,q:qq,box:1,due:addDays(dkey(),1)})}
@@ -789,11 +855,11 @@ $('resetYes').onclick=()=>{const keep={name:S.name,n:S.n,voice:S.voice,brk:S.brk
 const CIRC=['①','②','③','④'];
 function sheetHTML(k,lv,n,seed,opts={}){const rng=mulberry(seed);const qs=genSet(k,lv,n,rng);const L=LEVELS[k][lv];const title=`${S.grade}학년 ${SUBJ[k].name} ${lv+1}단계 · ${L.name}`;
   const isL=q=>q.lang==='en'&&/👂/.test(q.vis||'');
-  const qh=qs.map((q,i)=>{const lab=x=>{const nm=(q.labels&&q.labels[x])||(!isL(q)&&q.printNames&&q.printNames[x]);return esc(x)+(nm?`<small> ${esc(nm)}</small>`:'')};
+  const qh=qs.map((q,i)=>{const lab=x=>{const nm=(q.labels&&q.labels[x])||(!isL(q)&&q.printNames&&q.printNames[x]);return fmtMath(esc(x))+(nm?`<small> ${esc(nm)}</small>`:'')};
     const lis=isL(q)?`<div class="say">🔊 잘 듣고 골라요<br><small style="font-size:11px">(읽어 줄 말은 정답 쪽에 있어요)</small></div>`:'';
     const ans=q.input==='num'?'<span>답: (&emsp;&emsp;&emsp;&emsp;)</span>':q.choices.map((x,j)=>`<span>${CIRC[j]} ${lab(x)}</span>`).join('');
     return`<div class="wq"><span class="n">${i+1}. ${esc(q.text)}</span><div class="wv vis">${lis||q.vis||''}</div><div class="wc">${ans}</div></div>`}).join('');
-  const key=qs.map((q,i)=>`<div>${i+1}. ${q.input==='num'?'':CIRC[q.choices.indexOf(q.ans)]} ${esc((q.labels&&q.labels[q.ans])||(q.printNames&&q.printNames[q.ans])||q.ans)}</div>`).join('');
+  const key=qs.map((q,i)=>`<div>${i+1}. ${q.input==='num'?'':CIRC[q.choices.indexOf(q.ans)]} ${fmtMath(esc((q.labels&&q.labels[q.ans])||(q.printNames&&q.printNames[q.ans])||q.ans))}</div>`).join('');
   const readList=qs.some(isL)?`<h1 style="font-size:16px;margin-top:14px">어른이 읽어 줄 말</h1><div class="grid">${qs.map((q,i)=>isL(q)?`<div>${i+1}. “${esc(q.say)}”</div>`:'').join('')}</div>`:'';
   const meta=`<div class="meta"><span>이름: ________________</span><span>날짜: ____월 ____일</span><span>맞은 개수: ____ / ${n}</span></div>`;
   return`<div class="sheet"><h1>${title}</h1><p style="font-size:12px;margin:2px 0 6px">${esc(L.desc)} · 알맞은 답에 ○ 하세요.</p>${meta}<div class="grid">${qh}</div><div class="foot"><span>한걸음 공부방</span><span>${opts.page||''}</span></div></div>
@@ -815,5 +881,22 @@ window.renderLog=function(){document.body.classList.add('printmode');const days=
   <h1 style="margin-top:12px;font-size:18px">이번 주 잘한 점</h1><div style="border:1.5px solid #bbb;border-radius:10px;height:46mm"></div>
   <h1 style="margin-top:12px;font-size:18px">부모님 한마디</h1><div style="border:1.5px solid #bbb;border-radius:10px;height:36mm"></div></div>`};
 
-show('home');
+$('lsClose').onclick=()=>{closeLesson();show(P&&P.mode==='daily'?'home':'levels')};
+$('lsPlay').onclick=()=>{if(!LS)return;LS.playing=!LS.playing;lsBar();if(LS.playing)playStep();else{SC.stop();try{speechSynthesis.cancel()}catch(e){}}};
+$('lsPrev').onclick=()=>lsGo(-1);$('lsNext').onclick=()=>lsGo(1);
+$('lsAgain').onclick=()=>{LS.i=0;LS.playing=true;playStep()};
+$('lsSolve').onclick=()=>{const a=LS.after;closeLesson();a?a():show('home')};
+$('ls3d').onclick=()=>{const L=LEVELS[LS.k][LS.lv];SC.stop();try{speechSynthesis.cancel()}catch(e){}open3D(L.d3)};
+$('d3Back').onclick=()=>{close3D();show(prevView==='d3'?'home':prevView)};
+</script>
+<script src="js/visuals.js"></script>
+<script src="js/g3.js"></script>
+<script src="js/g4.js"></script>
+<script src="js/g5.js"></script>
+<script src="js/g6.js"></script>
+<script src="js/lessons.js"></script>
+<script src="js/three-scenes.js"></script>
+<script>
+[3,4,5,6].forEach(g=>{try{GRADES[g]=CURR[g]()}catch(e){console.error('grade',g,e)}});
+bindGrade();show('home');
 </script>
