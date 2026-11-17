@@ -262,6 +262,11 @@ body.printmode .sheet{border:0;border-radius:0;max-width:none;width:210mm;height
 .crsample{background:var(--bg);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:8px;align-items:center;text-align:center}
 .crsample .vis{font-size:2.4rem}.crsample .vis .big{font-size:3rem}.crsample .qtext{font-size:1.15rem}
 .crch{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}.crch>span{border:2px solid var(--line);border-radius:12px;padding:6px 12px;font-size:1.05rem}.crch>span.ok{border-color:var(--good);background:var(--sci-soft)}
+/* 영상 속도 조절 */
+.lsnext{min-height:56px;font-size:1.2rem;padding:10px 26px}
+.lsnext.pulse{animation:lspulse 1.4s ease-in-out infinite}
+@keyframes lspulse{0%,100%{transform:scale(1);box-shadow:0 0 0 0 color-mix(in srgb,var(--sun) 60%,transparent)}50%{transform:scale(1.06);box-shadow:0 0 0 10px transparent}}
+.lshint{text-align:center;font-family:var(--f-display);font-size:1.1rem;color:var(--muted);margin:0}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
@@ -310,7 +315,8 @@ body.printmode .sheet{border:0;border-radius:0;max-width:none;width:210mm;height
       <a class="small" id="lsVideo" target="_blank" rel="noopener" href="#">관련 영상 더 찾아보기 (부모님과 함께, YouTube)</a>
     </div>
     <p class="lscap" id="lsCap"></p>
-    <div class="row" style="justify-content:center"><button class="quiet" id="lsPrev">◀ 이전</button><button id="lsPlay">일시정지</button><button class="quiet" id="lsNext">다음 ▶</button></div>
+    <p class="lshint" id="lsHint" hidden>다 봤으면 <b>다음</b>을 눌러요. 다시 보고 싶으면 <b>다시 보기</b>!</p>
+    <div class="row" style="justify-content:center"><button class="quiet" id="lsPrev">◀ 이전</button><button id="lsReplay">↻ 다시 보기</button><button class="quiet" id="lsPlay">일시정지</button><button class="go lsnext" id="lsNext">다음 ▶</button></div>
   </section>
 
   <!-- 3D -->
@@ -454,6 +460,8 @@ body.printmode .sheet{border:0;border-radius:0;max-width:none;width:210mm;height
           <div class="set"><span>아이 이름</span><input type="text" id="stName" placeholder="예: 민준" style="font:inherit;padding:8px 10px;border-radius:10px;border:2px solid var(--line);background:var(--bg);color:var(--ink);width:160px"></div>
           <div class="set"><span>과목당 문제 수</span><select id="stN"><option value="3">3문제</option><option value="5">5문제</option><option value="7">7문제</option></select></div>
           <div class="set"><span>문제 읽어주기</span><select id="stVoice"><option value="1">켜기</option><option value="0">끄기</option></select></div>
+          <div class="set"><span>그림 영상 속도</span><select id="stLsSpeed"><option value="1.7">느리게 (추천)</option><option value="1.2">보통</option></select></div>
+          <div class="set"><span>그림 영상 넘기기</span><select id="stLsAuto"><option value="0">아이가 '다음'을 눌러 넘기기 (추천)</option><option value="1">자동으로 넘기기</option></select></div>
           <div class="set"><span>과목 사이 몸 깨우기</span><select id="stBreak"><option value="1">켜기</option><option value="0">끄기</option></select></div>
         </div>
         <div class="card">
@@ -866,7 +874,7 @@ function renderParent(){
     const col=acc==null?'var(--muted)':acc>=80?'var(--good)':acc>=60?'var(--sun)':'var(--bad)';
     return`<tr><td style="color:${SUBJ[k].color};font-family:var(--f-display);font-size:1.1rem">${SUBJ[k].name}</td><td>${S.level[k]+1}/${LEVELS[k].length} ${LEVELS[k][S.level[k]].name}</td><td class="num">${n}</td><td class="num" style="color:${col}">${acc==null?'기록 없음':acc+'%'}</td><td><button class="lvbtn" data-adj="${k}" data-d="-1" aria-label="${SUBJ[k].name} 단계 내리기">−</button> <button class="lvbtn" data-adj="${k}" data-d="1" aria-label="${SUBJ[k].name} 단계 올리기">+</button></td></tr>`}).join('');
   const t=dkey();$('rvBox').innerHTML=S.review.length?ORDER.map(k=>{const r=S.review.filter(x=>x.subj===k&&(x.grade||1)===S.grade);if(!r.length)return'';return`<p><b style="color:${SUBJ[k].color};font-family:var(--f-display);font-weight:400">${SUBJ[k].name}</b> ${r.length}개 (오늘 복습 ${r.filter(x=>x.due<=t).length}개): ${r.slice(0,6).map(x=>esc(x.q.text+(x.q.reveal?' '+x.q.reveal:''))).join(', ')}${r.length>6?' …':''}</p>`}).join(''):'<p class="muted">비어 있어요. 틀린 문제가 생기면 여기 모입니다.</p>';
-  $('stName').value=S.name;$('stN').value=S.n;$('stVoice').value=S.voice;$('stBreak').value=S.brk;
+  $('stName').value=S.name;$('stN').value=S.n;$('stVoice').value=S.voice;$('stBreak').value=S.brk;$('stLsSpeed').value=String(S.lsSpeed||1.7);$('stLsAuto').value=S.lsAuto?'1':'0';
   $('stGrade').value=S.grade;
   fillPrintSelect();
 }
@@ -876,6 +884,8 @@ $('stName').oninput=e=>{S.name=e.target.value.trim().slice(0,10);save()};
 $('stN').onchange=e=>{S.n=+e.target.value;save()};
 $('stVoice').onchange=e=>{S.voice=+e.target.value;save()};
 $('stBreak').onchange=e=>{S.brk=+e.target.value;save()};
+$('stLsSpeed').onchange=e=>{S.lsSpeed=+e.target.value;save()};
+$('stLsAuto').onchange=e=>{S.lsAuto=+e.target.value;save()};
 $('resetBtn').onclick=()=>$('resetYes').hidden=false;
 $('resetYes').onclick=()=>{const keep={name:S.name,n:S.n,voice:S.voice,brk:S.brk};S=Object.assign(blank(),keep,{grade:S.grade});bindGrade();save();$('resetYes').hidden=true;renderParent()};
 
@@ -944,7 +954,7 @@ window.renderLog=function(){document.body.classList.add('printmode');const days=
 
 $('lsClose').onclick=()=>{const pv=LS&&LS.preview;closeLesson();if(pv){show('parent');renderCourse()}else show(P&&P.mode==='daily'?'home':'levels')};
 $('lsPlay').onclick=()=>{if(!LS)return;LS.playing=!LS.playing;lsBar();if(LS.playing)playStep();else{SC.stop();try{speechSynthesis.cancel()}catch(e){}}};
-$('lsPrev').onclick=()=>lsGo(-1);$('lsNext').onclick=()=>lsGo(1);
+$('lsReplay').onclick=()=>{if(LS){LS.playing=true;playStep()}};$('lsPrev').onclick=()=>lsGo(-1);$('lsNext').onclick=()=>lsGo(1);
 $('lsAgain').onclick=()=>{LS.i=0;LS.playing=true;playStep()};
 $('lsSolve').onclick=()=>{const a=LS.after;closeLesson();a?a():show('home')};
 $('ls3d').onclick=()=>{const L=LEVELS[LS.k][LS.lv];SC.stop();try{speechSynthesis.cancel()}catch(e){}open3D(L.d3)};

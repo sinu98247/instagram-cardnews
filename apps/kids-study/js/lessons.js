@@ -1,5 +1,8 @@
 /* 배우기: 그림 영상(내레이션 + 단계별 애니메이션) 플레이어 */
-const SC={timers:[],T(ms,fn){this.timers.push(setTimeout(fn,ms))},stop(){this.timers.forEach(clearTimeout);this.timers=[]}};
+/* 속도: 1.7 = 느리게(기본), 1.2 = 보통 */
+const lsSpeed=()=>S.lsSpeed||1.7;
+const lsRate=lang=>lsSpeed()>1.4?(lang==='en'?.7:.82):(lang==='en'?.8:.95);
+const SC={timers:[],T(ms,fn){this.timers.push(setTimeout(fn,ms*lsSpeed()))},stop(){this.timers.forEach(clearTimeout);this.timers=[]}};
 const svgNS=(w,h,body)=>`<svg viewBox="0 0 ${w} ${h}" class="scn">${body}</svg>`;
 
 /* ---------- 장면(scene) 모음: (stage, p) => 재생 시간(ms) ---------- */
@@ -83,10 +86,10 @@ const LEARN={
 function learnSteps(g,k,lv){const st=(LEARN[`${g}.${k}.${lv}`]||[]).map(s=>({...s,p:{...s.p}}));st.forEach(s=>{if(s.p.html){s.p.html=s.p.html.replace('__RULER__',rulerSVG(0,7)).replace('__CIRCLE__',`<div class="vis svgc">${circleSVG(5,'반지름 5 cm')}</div><div class="sc-big">지름 = 10 cm</div>`).replace('__TOPGRID__',topGridHTML([[2,1,0],[1,3,1],[1,0,0]])+'<div class="sc-big">2+1+1+3+1+1 = 9개</div>')}});return st}
 
 /* ---------- 내레이션 ---------- */
-function narrateOnly(t,lang){if(!S.voice)return;try{const u=new SpeechSynthesisUtterance(t);u.lang=lang==='en'?'en-US':'ko-KR';const v=voices.find(v=>v.lang&&v.lang.replace('_','-').startsWith(lang==='en'?'en':'ko'));if(v)u.voice=v;u.rate=lang==='en'?.8:.95;speechSynthesis.speak(u)}catch(e){}}
-function narrate(t,lang,cb){let done=false;const fin=()=>{if(!done){done=true;cb&&cb()}};const est=Math.max(2200,t.length*(lang==='en'?90:140));
+function narrateOnly(t,lang){if(!S.voice)return;try{const u=new SpeechSynthesisUtterance(t);u.lang=lang==='en'?'en-US':'ko-KR';const v=voices.find(v=>v.lang&&v.lang.replace('_','-').startsWith(lang==='en'?'en':'ko'));if(v)u.voice=v;u.rate=lsRate(lang);speechSynthesis.speak(u)}catch(e){}}
+function narrate(t,lang,cb){let done=false;const fin=()=>{if(!done){done=true;cb&&cb()}};const est=Math.max(2400,t.length*(lang==='en'?100:150));
   if(!S.voice||!window.speechSynthesis){SC.T(est,fin);return}
-  try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang=lang==='en'?'en-US':'ko-KR';const v=voices.find(v=>v.lang&&v.lang.replace('_','-').startsWith(lang==='en'?'en':'ko'));if(v)u.voice=v;u.rate=lang==='en'?.8:.95;u.onend=fin;u.onerror=fin;speechSynthesis.speak(u);SC.T(est*2.2,fin)}catch(e){SC.T(est,fin)}}
+  try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang=lang==='en'?'en-US':'ko-KR';const v=voices.find(v=>v.lang&&v.lang.replace('_','-').startsWith(lang==='en'?'en':'ko'));if(v)u.voice=v;u.rate=lsRate(lang);u.onend=fin;u.onerror=fin;speechSynthesis.speak(u);SC.T(est*2.2,fin)}catch(e){SC.T(est,fin)}}
 
 /* ---------- 플레이어 ---------- */
 let LS=null;
@@ -96,15 +99,16 @@ function openLesson(k,lv,after){const g=S.grade,L=LEVELS[k][lv];
   LS={k,lv,g,steps,i:0,playing:true,after};
   $('lsTag').textContent=`${g}학년 ${SUBJ[k].name} ${lv+1}단계`;$('lsTag').style.background=SUBJ[k].soft;$('lsTag').style.color=SUBJ[k].color;$('lsTitle').textContent=L.name;
   show('learn');playStep()}
+function waitNext(){if(!LS||LS.i>=LS.steps.length-1)return;$('lsNext').classList.add('pulse');$('lsHint').hidden=false}
 function lsBar(){$('lsBar').innerHTML=LS.steps.map((_,i)=>`<i class="${i<LS.i?'ok':i===LS.i?'now':''}"></i>`).join('');$('lsPlay').textContent=LS.playing?'일시정지':'재생'}
-function playStep(){SC.stop();try{speechSynthesis.cancel()}catch(e){}const s=LS.steps[LS.i],st=$('lsStage');lsBar();$('lsCap').textContent='';$('lsEnd').hidden=true;st.hidden=false;
-  const next=()=>{if(LS&&LS.playing)SC.T(900,()=>lsGo(1))};
+function playStep(){SC.stop();$('lsNext').classList.remove('pulse');$('lsHint').hidden=true;try{speechSynthesis.cancel()}catch(e){}const s=LS.steps[LS.i],st=$('lsStage');lsBar();$('lsCap').textContent='';$('lsEnd').hidden=true;st.hidden=false;
+  const next=()=>{if(!LS)return;if(S.lsAuto&&LS.playing)SC.T(2500,()=>lsGo(1));else waitNext()};
   if(s.kind==='intro'){const L=LEVELS[LS.k][LS.lv];st.innerHTML=`<div class="sc-intro" style="background:${SUBJ[LS.k].soft}"><span class="tag" style="background:var(--surface)">${esc(L.area||'')}</span><h2 style="font-size:2rem;color:${SUBJ[LS.k].color}">${esc(L.name)}</h2><p>${esc(L.desc)}</p></div>`;$('lsCap').textContent=s.say;narrate(s.say,'ko',next);return}
   if(s.kind==='scene'){const dur=SCENES[s.scene](st,s.p);$('lsCap').textContent=s.say;let a=false,b=false;const both=()=>{if(a&&b)next()};SC.T(dur,()=>{a=true;both()});narrate(s.say,'ko',()=>{b=true;both()});return}
   if(s.kind==='example'){const q=s.q;const ch=q.input==='num'?`<div class="numdisp" id="exAns" style="max-width:260px;margin:0 auto">?</div>`:`<div class="choices ${q.choices.length===3&&!q.choices.some(x=>String(x).length>7)?'c3':''} ${q.choices.some(x=>String(x).length>7)?'long':''}">${q.choices.map(x=>`<button disabled data-a="${esc(x)}" class="${q.big?'bigc':''}${String(x).length>7?' txt':''}">${fmtMath(esc(x))}${q.labels&&q.labels[x]?`<small>${esc(q.labels[x])}</small>`:''}</button>`).join('')}</div>`;
     st.innerHTML=`<div class="sc-ex"><span class="tag" style="background:var(--sun-soft)">예제 ${s.i+1}</span><div class="vis">${q.vis||''}</div><p class="qtext">${esc(q.text)}</p>${ch}<div class="fb" id="exFb"></div></div>`;
     $('lsCap').textContent='예제를 함께 풀어 봐요. 먼저 생각해 보세요.';
-    narrate(q.say,q.lang||'ko',()=>{let n=3;const cd=()=>{if(!LS)return;$('exFb').textContent=n?`생각할 시간… ${n}`:'';if(n>0){n--;SC.T(1000,cd)}else{
+    narrate(q.say,q.lang||'ko',()=>{let n=5;const cd=()=>{if(!LS)return;$('exFb').textContent=n?`생각할 시간… ${n}`:'';if(n>0){n--;SC.T(1000,cd)}else{
       const lab=q.labels&&q.labels[q.ans]?q.labels[q.ans]:q.ans;if(q.input==='num'){$('exAns').textContent=q.ans;$('exAns').classList.add('right')}else st.querySelectorAll('button[data-a]').forEach(b=>{if(b.dataset.a===q.ans)b.classList.add('right')});
       $('exFb').className='fb ok';$('exFb').innerHTML=`정답은 ${fmtMath(esc(lab))}${q.reveal?` · ${esc(q.reveal)}`:''}`;narrate(`정답은 ${String(lab).replace(/(\d+)\/(\d+)/g,'$2분의 $1')}`,q.ansLang&&!q.input?q.ansLang:'ko',next)}};cd()});return}
   /* end */
