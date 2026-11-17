@@ -110,7 +110,7 @@ function playStep(){SC.stop();try{speechSynthesis.cancel()}catch(e){}const s=LS.
   /* end */
   st.hidden=true;$('lsEnd').hidden=false;const L=LEVELS[LS.k][LS.lv];$('ls3d').hidden=!L.d3;
   const qs=encodeURIComponent(`EBS 초등 ${LS.g}학년 ${SUBJ[LS.k].name} ${L.name}`);$('lsVideo').href=`https://www.youtube.com/results?search_query=${qs}`;
-  $('lsCap').textContent='이제 직접 풀어 볼까요?';narrate('이제 직접 풀어 볼까요?','ko');S.learned=S.learned||{};S.learned[`${LS.g}.${LS.k}.${LS.lv}`]=1;save();lsBar()}
+  $('lsCap').textContent='이제 직접 풀어 볼까요?';narrate('이제 직접 풀어 볼까요?','ko');$('lsSolve').textContent=LS.preview?'부모님 공간으로':'문제 풀기';if(!LS.preview){S.learned=S.learned||{};S.learned[`${LS.g}.${LS.k}.${LS.lv}`]=1;save()}lsBar()}
 function lsGo(d){if(!LS)return;const n=LS.i+d;if(n<0||n>=LS.steps.length)return;LS.i=n;playStep()}
-function closeLesson(){SC.stop();try{speechSynthesis.cancel()}catch(e){}LS=null}
+function closeLesson(){SC.stop();try{speechSynthesis.cancel()}catch(e){}if(LS&&LS.restore!=null){S.grade=LS.restore;bindGrade()}LS=null}
 document.addEventListener('DOMContentLoaded',()=>{});
