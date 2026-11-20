@@ -674,7 +674,7 @@
   {
     "date": "2026-11-21",
     "slot": "morning",
-    "started_at": "2026-11-21T02:14:38.404894+09:00",
+    "started_at": "2026-11-21T03:56:13.093251+09:00",
     "status": "failed",
     "failed_step": "write",
     "error": "[write-llm] [config] 환경변수 LLM_API_KEY 가 설정되지 않았습니다"
