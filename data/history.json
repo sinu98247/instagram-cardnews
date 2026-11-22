@@ -702,5 +702,13 @@
     "status": "failed",
     "failed_step": "write",
     "error": "[write-llm] [config] 환경변수 LLM_API_KEY 가 설정되지 않았습니다"
+  },
+  {
+    "date": "2026-11-22",
+    "slot": "lunch",
+    "started_at": "2026-11-22T12:06:25.928838+09:00",
+    "status": "failed",
+    "failed_step": "write",
+    "error": "[write-llm] [config] 환경변수 LLM_API_KEY 가 설정되지 않았습니다"
   }
 ]
